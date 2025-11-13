@@ -2,3 +2,5 @@
 @tailwindcss base;
 @tailwindcss components;
 @tailwindcss utilities;
+/* Custom dark mode variant */
+@custom-variant dark (&:where(.dark, .dark *));

@@ -1,10 +1,10 @@
-/** @type {import('tailwindcss').Config} */
+ {import('tailwindcss').Config}
 export default {
     content: [
         "./index.html",
-        "./src/**/*.{js,ts,jsx,tsx}", // Esto incluye todos los archivos dentro de src
-        "./src/pages/**/*.{js,ts,jsx,tsx}", // Específico para páginas si es necesario
-        "./src/components/**/*.{js,ts,jsx,tsx}" // Específico para componentes
+        "./src/**/*.{js,ts,jsx,tsx}",
+        "./src/Pages/**/*.{js,ts,jsx,tsx}",
+        "./src/Components/**/*.{js,ts,jsx,tsx}"
     ],
     darkMode: "class",
     theme: {

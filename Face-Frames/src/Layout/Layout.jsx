@@ -1,24 +1,27 @@
 /* eslint-disable no-unused-vars */
 import React from "react";
 import { Outlet } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import Navbar from "../Components/Navbar";
 //import Footer from "../components/Footer";
 import './Layout.css';
 
 function Layout() {
     return (
-        <div>
-            <div className="bg-gray-dark">
+        <div className="bg-white text-black dark:bg-gray-800 dark:text-white min-h-screen">
+            <header>
                 <Navbar/>
-            </div>
+            </header>
 
-            <main className="bg-gray-light py-2">
+            {/* El main hereda el color de fondo y de texto del padre. Solo ajustamos el padding. */}
+            <main className="py-2">
                 <Outlet />
             </main>
 
-            <div className="bg-gray-dark">
+            {/* Usamos un footer semántico y clases responsivas para su propio fondo */}
+            <footer className="bg-gray-200 dark:bg-gray-800 p-4">
                 {/* <Footer /> */}
-            </div>
+                <p className="text-center text-sm">© FaceFrames 2024</p>
+            </footer>
         </div>
     );
 }
