@@ -27,18 +27,18 @@ function Footer() {
 
                     {/* Column 2 */}
                     <div className="w-full md:w-1/2 lg:w-1/4">
-                        <h3 className="text-xl font-semibold mb-4 border-b-2 border-sky-400 inline-block">
+                        <h3 className="text-xl font-semibold mb-4 border-b-2 border-sky-200 inline-block">
                             Developers
                         </h3>
                         <ul className="space-y-3 text-white">
                             <li>
-                                <a href="#" className={`text-base duration-300 ${hoverColor}`}>
-                                    Development
+                                <a href="https://alejandromtz10.github.io/AlejandroDev" className={`text-base duration-300 ${hoverColor}`}>
+                                    Developed by
                                 </a>
                             </li>
                             <li>
-                                <a href="#" className={`text-base duration-300 ${hoverColor}`}>
-                                    Contact
+                                <a href="https://github.com/AlejandroMtz10/Face-Frames" className={`text-base duration-300 ${hoverColor}`}>
+                                    Repository
                                 </a>
                             </li>
                         </ul>
@@ -46,17 +46,17 @@ function Footer() {
 
                     {/* Column 3 */}
                     <div className="w-full md:w-1/2 lg:w-1/4">
-                        <h3 className="text-xl font-semibold mb-4 border-b-2 border-sky-400 inline-block">
+                        <h3 className="text-xl font-semibold mb-4 border-b-2 border-sky-200 inline-block">
                             Social Media
                         </h3>
                         <ul className="flex space-x-5 mt-2">
                             <li>
-                                <a href="#" className={`text-4xl duration-300 ${hoverColor}`} aria-label="GitHub">
+                                <a href="https://github.com/AlejandroMtz10" className={`text-6xl duration-300 ${hoverColor}`} aria-label="GitHub">
                                     <FaGithubSquare />
                                 </a>
                             </li>
                             <li>
-                                <a href="#" className={`text-4xl duration-300 ${hoverColor}`} aria-label="LinkedIn">
+                                <a href="https://www.linkedin.com/in/alejandro-martínez-rivera-a35541248" className={`text-6xl duration-300 ${hoverColor}`} aria-label="LinkedIn">
                                     <FaLinkedin />
                                 </a>
                             </li>
@@ -64,7 +64,7 @@ function Footer() {
                     </div>
                 </div>
 
-                <hr />
+                <hr className="border-0"/>
 
                 {/* Copyright */}
                 <div className="py-4">
