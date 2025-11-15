@@ -1,4 +1,5 @@
 import React from "react";
+import Carousel from "../../Components/Carousel";
 
 function Home() {
     return (
@@ -7,6 +8,9 @@ function Home() {
             <p className="text-center text-lg mx-4">
                 Discover the perfect glasses for your face based on the shape of your face.
             </p>
+            <div className="p-4">
+                <Carousel />
+            </div>
         </div>
     );
 }
