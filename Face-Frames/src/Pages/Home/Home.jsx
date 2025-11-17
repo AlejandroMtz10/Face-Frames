@@ -1,6 +1,6 @@
 import React from "react";
 import Carousel from "../../Components/Carousel";
-
+import MainCard from "../../Components/MainCard";
 function Home() {
     return (
         <div>
@@ -10,6 +10,9 @@ function Home() {
             </p>
             <div className="p-4">
                 <Carousel />
+            </div>
+            <div className="px-4 py-2">
+                <MainCard />
             </div>
         </div>
     );
