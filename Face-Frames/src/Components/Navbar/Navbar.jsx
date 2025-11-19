@@ -57,7 +57,7 @@ function Navbar() {
       {/* Menú móvil */}
       {isOpen && (
         <ul
-          className={`sm:hidden flex flex-col items-center gap-2 pb-4 animate-slide-down bg-emerald-700 dark:bg-gray-800`}
+          className={`sm:hidden flex flex-col items-center gap-2 pb-4 animate-slide-down bg-emerald-800 `}
         >
           <Link to="/" onClick={toggleMenu}>
             <li className="flex items-center gap-2 text-xl hover:underline hover:text-sky-500">
