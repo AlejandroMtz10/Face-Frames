@@ -32,7 +32,7 @@ function Navbar() {
             <Link to="/Glasses">
               <li className="flex flex-col items-center text-xl hover:underline hover:text-blue-500 duration-300">
                 <GiSunglasses />
-                Glasses
+                Analyzer
               </li>
             </Link>
 
@@ -67,7 +67,7 @@ function Navbar() {
 
           <Link to="/Glasses" onClick={toggleMenu}>
             <li className="flex items-center gap-2 text-xl hover:underline hover:text-sky-500">
-              <GiSunglasses /> Glasses
+              <GiSunglasses /> Analyzer
             </li>
           </Link>
 

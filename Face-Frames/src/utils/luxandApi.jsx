@@ -1,13 +1,6 @@
-// Note: We are hardcoding these values to bypass the 'undefined' error 
-// caused by environment variables not being read correctly by Vite/Bundler.
-const LUXAND_API_TOKEN = 'c6efb644a6604a7987274c11b349e52d';
-const LUXAND_API_ENDPOINT = 'https://api.luxand.cloud/photo/landmarks';
+const LUXAND_API_ENDPOINT = import.meta.env.VITE_LUXAND_ENDPOINT;
+const LUXAND_API_TOKEN = import.meta.env.VITE_LUXAND_TOKEN;
 
-/**
- * Sends an image file to the Luxand API for landmark analysis.
- * @param {File} imageFile - The file object to upload.
- * @returns {Promise<object>} The API response containing face landmarks.
- */
 export async function analyzeFaceWithLuxand(imageFile) {
     // CRITICAL FIX: The variables are now guaranteed to be strings, so this check will pass.
     if (!LUXAND_API_ENDPOINT || !LUXAND_API_TOKEN) {
