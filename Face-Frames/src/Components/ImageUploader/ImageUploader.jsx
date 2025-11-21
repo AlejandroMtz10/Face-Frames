@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
-import { analyzeFaceWithLuxand } from "../../utils/luxandApi.js";
-import { calculateFaceShape, getLensRecommendation } from "../../utils/faceShape.js";
+import { analyzeFaceWithLuxand } from "../../utils/luxandApi.jsx";
+import { calculateFaceShape, getLensRecommendation } from "../../utils/faceShape.jsx";
 import { FiUploadCloud } from "react-icons/fi";
 import { TbLoader2 } from "react-icons/tb";
 
@@ -124,7 +124,7 @@ export default function ImageUploader() {
                             onDragOver={handleDragOver}
                             onDragLeave={handleDragLeave}
                             className={`w-full p-10 mb-4 rounded-xl border-2 border-dashed transition duration-300 ${
-                                isDragging ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300 hover:border-indigo-400'
+                                isDragging ? 'border-blue-500 bg-indigo-50' : 'border-gray-300 hover:border-blue-400'
                             } cursor-pointer`}
                         >
                             <label htmlFor="file-upload" className="flex flex-col items-center justify-center text-center">
@@ -144,14 +144,14 @@ export default function ImageUploader() {
                                     {preview ? "Image Selected" : "Click to Upload or Drag and Drop"}
                                 </p>
                                 <p className="text-sm text-gray-500 dark:text-gray-200">
-                                    Supported formats: JPEG, PNG, WebP
+                                    Supported formats: JPEG & PNG
                                 </p>
                             </label>
                             {/* Hidden File Input */}
                             <input
                                 id="file-upload"
                                 type="file"
-                                accept="image/jpeg,image/png,image/webp"
+                                accept="image/jpeg,image/png"
                                 className="hidden"
                                 onChange={handleImageChange}
                             />
@@ -162,7 +162,7 @@ export default function ImageUploader() {
                     <button
                         onClick={handleAnalyze}
                         disabled={loading || !file}
-                        className="w-full py-3 mb-6 bg-indigo-600 text-white font-extrabold text-lg rounded-xl hover:bg-indigo-700 disabled:bg-indigo-300 transition duration-150 shadow-lg"
+                        className="w-full py-3 mb-6 bg-blue-600 text-white font-extrabold text-lg rounded-xl hover:bg-blue-700 disabled:bg-blue-300 transition duration-150 shadow-lg"
                     >
                         {loading ? (
                             <div className="flex items-center justify-center">
