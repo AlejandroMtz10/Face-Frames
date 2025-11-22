@@ -48,12 +48,12 @@
         "description": "A heart-shaped face is characterized by a wider forehead and cheekbones that taper down to a narrow, pointed chin. The face resembles the shape of a heart.",
         "glasses":[
             {
-                "Bottom-heavy and semi-rimless frames": "These add visual weight below the eyes, balancing the wider forehead.",
-                "Oval glasses": "Their curved shape softens angular features and balances the face without being too tall, which could emphasize the cheekbones.",
-                "Round glasses": "These provide symmetry and soften the features of a heart-shaped face by drawing attention to the eyes.",
-                "Cat-eye and butterfly frames": "The upswept corners of cat-eye frames and the oversized, wing-like shape of butterfly frames accentuate cheekbones and create a balanced look by drawing the eye upward and away from a wide forehead.",
-                "Square and rectangular frames": "These provide balance by drawing attention to the lower part of the face. For rectangular frames, choose thin, light-colored options to avoid looking top-heavy.",
-                "Aviator frames": "The tall, tapered shape of aviators can help balance the face by contrasting with a narrow chin." 
+                "Bottom-heavy and semi-rimless": "These add visual weight below the eyes, balancing the wider forehead.",
+                "Oval": "Their curved shape softens angular features and balances the face without being too tall, which could emphasize the cheekbones.",
+                "Round": "These provide symmetry and soften the features of a heart-shaped face by drawing attention to the eyes.",
+                "Cat-eye and butterfly": "The upswept corners of cat-eye frames and the oversized, wing-like shape of butterfly frames accentuate cheekbones and create a balanced look by drawing the eye upward and away from a wide forehead.",
+                "Square and rectangular": "These provide balance by drawing attention to the lower part of the face. For rectangular frames, choose thin, light-colored options to avoid looking top-heavy.",
+                "Aviator": "The tall, tapered shape of aviators can help balance the face by contrasting with a narrow chin." 
             }
         ],
         "pictures":[
@@ -84,11 +84,11 @@
         "description":"An oblong face shape is characterized by a longer length compared to its width.",
         "glasses":[
             {
-                "Tall square or rectangular frames": "These are a great option because they add width to the face. Look for frames that are slightly wider than your cheekbones.",
+                "Tall square or rectangular": "These are a great option because they add width to the face. Look for frames that are slightly wider than your cheekbones.",
                 "Aviators": "This style adds width to the upper part of the face and can draw attention away from the jawline, helping to balance the face's length.",
-                "Geometric frames": "Shapes like hexagons or other angular designs provide a stylish contrast to the softer curves of an oblong face.",
-                "Oversized frames": "Frames that are larger than your face can help to reduce the appearance of length while making a bold statement.",
-                "Cat-eye frames": "The upward sweep at the corners of cat-eye glasses draws attention upward and to the browline, adding a lift and horizontal line to the face. "
+                "Geometric": "Shapes like hexagons or other angular designs provide a stylish contrast to the softer curves of an oblong face.",
+                "Oversized": "Frames that are larger than your face can help to reduce the appearance of length while making a bold statement.",
+                "Cat-eye": "The upward sweep at the corners of cat-eye glasses draws attention upward and to the browline, adding a lift and horizontal line to the face. "
             }
         ],
         "pictures":[
