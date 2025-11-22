@@ -1,0 +1,101 @@
+[
+    {
+        "name": "Oval",
+        "description": "An oval face shape is characterized by balanced proportions, with the forehead being slightly wider than the chin. The cheekbones are the widest part of the face, and the jawline is gently rounded.",
+        "glasses":[
+            {
+                "Rectangular and Square": "These provide a bold contrast to the softer lines of an oval face, creating a more structured look.",
+                "Round": "Round frames can enhance the natural curves of an oval face, offering a balanced and timeless appearance.",
+                "Cat-eye": "These glasses add glamour and femininity, drawing attention to the cheekbones and eyes with their upward-sweeping corners.",
+                "Aviator": "Aviator frames complement the natural balance of an oval face and offer a classic style.",
+                "Browline": "These frames create a sophisticated look by highlighting the upper half of the face. "
+            }
+        ],
+        "pictures":[
+            {
+
+            }
+        ]
+    },{
+        "name": "Round",
+        "description": "A round face shape is characterized by full cheeks and a rounded jawline. The width and length of the face are roughly equal, giving it a circular appearance.",
+        "glasses":[
+            {
+                "Square and rectangular": "These are the top recommendations because their sharp lines and angles create a strong contrast with a round face's soft curves. They add definition and can visually elongate the face.",
+                "Geometric": "Shapes like hexagons or octagons provide a stylish, angular look that adds interest and breaks up the face's symmetry.",
+                "Cat-eye": "The upswept corners of cat-eye frames draw attention upward and outward, which helps to lengthen the face and add a chic, elegant touch.",
+                "Browline": "These frames highlight the browline and add a sense of length to the face, creating a structured and defined look." 
+            }
+        ],
+        "pictures":[
+            {
+
+            }
+        ]
+    },{
+        "name": "Square",
+        "description": "A square face shape is characterized by a strong jawline, a broad forehead, and wide cheekbones. The width and length of the face are roughly equal, giving it a boxy appearance.",
+        "pictures":[
+            {
+                "Round and oval": "These shapes are ideal because the curves contrast with the sharp angles of a square face. Oval frames can be a good option, especially if they are wider than they are tall, as this helps balance the proportions.",
+                "Cat-eye": "These frames have a curved, upswept browline that complements the strong lines of a square face and draws attention to the eyes.",
+                "Browline": "These glasses highlight strong features without overwhelming them, creating a balanced look.",
+                "Aviator": "This style can also work for a square face by shining a light on its attributes." 
+            }
+        ]
+    },{
+        "name": "Heart",
+        "description": "A heart-shaped face is characterized by a wider forehead and cheekbones that taper down to a narrow, pointed chin. The face resembles the shape of a heart.",
+        "glasses":[
+            {
+                "Bottom-heavy and semi-rimless frames": "These add visual weight below the eyes, balancing the wider forehead.",
+                "Oval glasses": "Their curved shape softens angular features and balances the face without being too tall, which could emphasize the cheekbones.",
+                "Round glasses": "These provide symmetry and soften the features of a heart-shaped face by drawing attention to the eyes.",
+                "Cat-eye and butterfly frames": "The upswept corners of cat-eye frames and the oversized, wing-like shape of butterfly frames accentuate cheekbones and create a balanced look by drawing the eye upward and away from a wide forehead.",
+                "Square and rectangular frames": "These provide balance by drawing attention to the lower part of the face. For rectangular frames, choose thin, light-colored options to avoid looking top-heavy.",
+                "Aviator frames": "The tall, tapered shape of aviators can help balance the face by contrasting with a narrow chin." 
+            }
+        ],
+        "pictures":[
+            {
+
+            }
+        ]
+    },{
+        "name": "Diamond",
+        "description": "A diamond face shape is characterized by high cheekbones and a narrow forehead and jawline. The widest part of the face is at the cheekbones, giving it a diamond-like appearance.",
+        "glasses":[
+            {
+                "Oval": "These frames soften high cheekbones and narrow foreheads.",
+                "Round": "The rounded shape provides a strong contrast to the angularity of a diamond face.",
+                "Cat-eye": "The upswept browlines accentuate high cheekbones while contrasting with a narrow chin.",
+                "Butterfly": "These frames are wider at the temples, which helps balance the lower half of the face.",
+                "Oversized": "Larger frames can draw attention away from angular parts of the face.",
+                "Aviator": "The top-heavy, rounded design draws the eye down and complements the cheekbones and chin."
+            }
+        ],
+        "pictures":[
+            {
+
+            }
+        ]
+    },{
+        "name":"Oblong",
+        "description":"An oblong face shape is characterized by a longer length compared to its width.",
+        "glasses":[
+            {
+                "Tall square or rectangular frames": "These are a great option because they add width to the face. Look for frames that are slightly wider than your cheekbones.",
+                "Aviators": "This style adds width to the upper part of the face and can draw attention away from the jawline, helping to balance the face's length.",
+                "Geometric frames": "Shapes like hexagons or other angular designs provide a stylish contrast to the softer curves of an oblong face.",
+                "Oversized frames": "Frames that are larger than your face can help to reduce the appearance of length while making a bold statement.",
+                "Cat-eye frames": "The upward sweep at the corners of cat-eye glasses draws attention upward and to the browline, adding a lift and horizontal line to the face. "
+            }
+        ],
+        "pictures":[
+            {
+
+            }
+        ]
+    }
+
+]
