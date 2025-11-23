@@ -1,110 +1,126 @@
-import React, { useState, useCallback } from "react";
-import { analyzeFaceWithLuxand } from "../../utils/luxandApi.jsx";
-import { calculateFaceShape, getLensRecommendation } from "../../utils/faceShape.jsx";
+import React, { useState, useCallback, useRef, useEffect } from "react";
+import { calculateFaceShape, getLensRecommendation } from "../../utils/face_shape.jsx";
 import { FiUploadCloud } from "react-icons/fi";
 import { TbLoader2 } from "react-icons/tb";
 
+import * as faceapi from "face-api.js";
+
+const MODEL_URL = "/models";
 
 export default function ImageUploader() {
     const [preview, setPreview] = useState(null);
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [modelsLoaded, setModelsLoaded] = useState(false);
     const [faceShape, setFaceShape] = useState({ shape: null, recommendation: null });
     const [error, setError] = useState(null);
     const [isDragging, setIsDragging] = useState(false);
 
-    // Unified function to handle file processing
+    const imageRef = useRef(null);
+
+    // Cargar modelos SOLO una vez
+    useEffect(() => {
+        const loadModels = async () => {
+            setLoading(true);
+
+            try {
+                // SOLO los modelos que tú tienes descargados
+                await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+                await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+
+                console.log("Modelos tiny + landmarks cargados correctamente");
+                setModelsLoaded(true);
+            } catch (err) {
+                console.error("Error al cargar modelos:", err);
+                setError("No se pudieron cargar los modelos. Verifica /public/models.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadModels();
+    }, []);
+
     const processFile = useCallback((selectedFile) => {
         if (!selectedFile) return;
 
-        // Supported file types
-        const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
-
+        const validTypes = ["image/jpeg", "image/png", "image/webp"];
         if (!validTypes.includes(selectedFile.type)) {
-            setError("Unsupported file format. Please use JPEG, PNG, or WebP.");
-            setFile(null);
+            setError("Formato de archivo no compatible.");
             setPreview(null);
             return;
         }
 
         setFile(selectedFile);
-        // Create object URL for image preview
-        setPreview(URL.createObjectURL(selectedFile)); 
+        setPreview(URL.createObjectURL(selectedFile));
         setError(null);
         setFaceShape({ shape: null, recommendation: null });
     }, []);
 
-    // Handle file input change
     const handleImageChange = (e) => {
-        const selectedFile = e.target.files[0];
-        processFile(selectedFile);
+        processFile(e.target.files[0]);
     };
 
-    // Handle file drop event
     const handleDrop = (e) => {
         e.preventDefault();
         setIsDragging(false);
-        const droppedFile = e.dataTransfer.files[0];
-        if (droppedFile) {
-            processFile(droppedFile);
-        }
+        processFile(e.dataTransfer.files[0]);
     };
 
-    // Prevent default behavior for drag events
     const handleDragOver = (e) => {
         e.preventDefault();
         setIsDragging(true);
     };
 
-    // Reset drag state when leaving the zone
     const handleDragLeave = (e) => {
         e.preventDefault();
         setIsDragging(false);
     };
 
+    // ANALIZAR ROSTRO
     const handleAnalyze = async () => {
-        if (!file) {
-            setError("Please select or drop an image first.");
-            return;
+        if (!file || !imageRef.current) {
+            return setError("Selecciona una imagen primero.");
+        }
+
+        if (!modelsLoaded) {
+            return setError("Los modelos aún se están cargando.");
         }
 
         setLoading(true);
         setError(null);
-        setFaceShape({ shape: null, recommendation: null });
 
         try {
-            // Call API function
-            const apiResponse = await analyzeFaceWithLuxand(file); 
+            await new Promise((resolve) => {
+                if (imageRef.current.complete) resolve();
+                else imageRef.current.onload = resolve;
+            });
 
-            const detectedFaces = apiResponse.landmarks;
-            // Check for success status and if landmarks array contains data
-            const isFaceDetected = apiResponse.status === "success" && Array.isArray(detectedFaces) && detectedFaces.length > 0;
+            // 🔵 USANDO tiny_face_detector
+            const detections = await faceapi
+                .detectAllFaces(
+                    imageRef.current,
+                    new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.5 })
+                )
+                .withFaceLandmarks();
 
-            if (isFaceDetected) {
-                // Face landmarks are in the first element of the 'landmarks' array
-                const firstFaceLandmarks = detectedFaces[0]; 
-                
-                // Classify face shape
-                const shape = calculateFaceShape(firstFaceLandmarks);
-                const recommendation = getLensRecommendation(shape);
-
-                setFaceShape({ shape, recommendation });
-
-            } else {
-                // Handle API error or no detection
-                let detectionError = "Luxand API did not detect any faces in the image. Ensure the face is clear and well-lit.";
-
-                if (apiResponse && apiResponse.status === "failure") {
-                    detectionError = `API Error: ${apiResponse.message}`;
-                } 
-                
-                setError(detectionError);
-                setFaceShape({ shape: "N/A", recommendation: "Please try with a different image." });
+            if (!detections.length) {
+                setError("No se detectó ningún rostro.");
+                return;
             }
 
+            const positions = detections[0].landmarks.positions.map((p) => ({
+                x: p.x,
+                y: p.y,
+            }));
+
+            const shape = calculateFaceShape(positions);
+            const recommendation = getLensRecommendation(shape);
+
+            setFaceShape({ shape, recommendation });
         } catch (err) {
             console.error(err);
-            setError(err.message || "An unexpected error occurred during analysis.");
+            setError("Error durante el análisis del rostro.");
         } finally {
             setLoading(false);
         }
@@ -115,91 +131,83 @@ export default function ImageUploader() {
             <div className="w-full max-w-2xl">
                 <div className="bg-white dark:bg-emerald-900 rounded-xl shadow-2xl p-6 sm:p-8 border border-gray-200">
 
-                    {/* Image Upload/Drop Zone Section */}
+                    {preview && (
+                        <img
+                            ref={imageRef}
+                            src={preview}
+                            alt="analyze"
+                            crossOrigin="anonymous"
+                            className="absolute opacity-0 pointer-events-none w-px h-px"
+                        />
+                    )}
+
+                    {/* Área de carga */}
                     <div className="mb-8 flex flex-col items-center">
-                        
-                        {/* Drop Zone */}
-                        <div 
+                        <div
                             onDrop={handleDrop}
                             onDragOver={handleDragOver}
                             onDragLeave={handleDragLeave}
-                            className={`w-full p-10 mb-4 rounded-xl border-2 border-dashed transition duration-300 ${
-                                isDragging ? 'border-blue-500 bg-indigo-50' : 'border-gray-300 hover:border-blue-400'
+                            className={`w-full p-10 mb-4 rounded-xl border-2 border-dashed transition ${
+                                isDragging ? "border-blue-500 bg-indigo-50" : "border-gray-300"
                             } cursor-pointer`}
                         >
-                            <label htmlFor="file-upload" className="flex flex-col items-center justify-center text-center">
-                                {/* Preview / Placeholder */}
-                                <div className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 overflow-hidden mb-4 border-2 border-gray-300 shadow-inner">
+                            <label htmlFor="file-upload" className="flex flex-col items-center">
+                                <div className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden mb-4 border-2 border-gray-300 shadow-inner">
                                     {preview ? (
-                                        <img
-                                            src={preview}
-                                            alt="Image Preview"
-                                            className="w-full h-full object-cover"
-                                        />
+                                        <img src={preview} alt="preview" className="w-full h-full object-cover" />
                                     ) : (
                                         <FiUploadCloud className="w-8 h-8 text-gray-400" />
                                     )}
                                 </div>
-                                <p className="text-gray-700 dark:text-white font-semibold text-lg">
-                                    {preview ? "Image Selected" : "Click to Upload or Drag and Drop"}
-                                </p>
-                                <p className="text-sm text-gray-500 dark:text-gray-200">
-                                    Supported formats: JPEG & PNG
+
+                                <p className="text-gray-700 dark:text-white text-lg font-semibold">
+                                    {preview ? "Imagen Seleccionada" : "Haz clic o arrastra una imagen"}
                                 </p>
                             </label>
-                            {/* Hidden File Input */}
+
                             <input
                                 id="file-upload"
                                 type="file"
-                                accept="image/jpeg,image/png"
+                                accept="image/jpeg,image/png,image/webp"
                                 className="hidden"
                                 onChange={handleImageChange}
                             />
                         </div>
                     </div>
 
-                    {/* Analysis Button */}
+                    {/* Botón de análisis */}
                     <button
                         onClick={handleAnalyze}
-                        disabled={loading || !file}
-                        className="w-full py-3 mb-6 bg-blue-600 text-white font-extrabold text-lg rounded-xl hover:bg-blue-700 disabled:bg-blue-300 transition duration-150 shadow-lg"
+                        disabled={loading || !file || !modelsLoaded}
+                        className="w-full py-3 mb-6 bg-blue-600 text-white font-extrabold text-lg rounded-xl hover:bg-blue-700 disabled:bg-blue-300 transition shadow-lg"
                     >
                         {loading ? (
-                            <div className="flex items-center justify-center">
-                                <TbLoader2 className="h-5 w-5 text-white animate-spin" />
-                                Analyzing...
-                            </div>
+                            <span className="flex items-center justify-center">
+                                <TbLoader2 className="h-5 w-5 animate-spin mr-2" />
+                                Procesando...
+                            </span>
                         ) : (
-                            "Analyze Face"
+                            "Analizar Rostro"
                         )}
                     </button>
 
-                    {/* Results Section */}
-                    <div className="space-y-4">
-                        {/* Error Display */}
-                        {error && (
-                            <div className="bg-red-100 p-4 rounded-lg border border-red-300">
-                                <p className="text-red-700 font-semibold">Error:</p>
-                                <p className="text-sm text-red-600">{error}</p>
-                            </div>
-                        )}
-
-                        {/* Shape Result */}
-                        <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-300">
-                            <p className="text-sm font-medium text-emerald-800">Detected Face Shape:</p>
-                            <p id="faceShapeResult" className="text-2xl font-bold text-emerald-700 mt-1">
-                                {faceShape.shape || "--"}
-                            </p>
+                    {/* Resultado */}
+                    {error && (
+                        <div className="bg-red-100 p-4 rounded-lg border border-red-300 mb-4">
+                            <p className="text-red-700 font-semibold">{error}</p>
                         </div>
+                    )}
 
-                        {/* Recommendation */}
-                        <div className="bg-blue-50 p-4 rounded-lg border border-blue-300">
-                            <p className="text-sm font-medium text-blue-800">Eyewear Recommendation:</p>
-                            <p id="recommendationResult" className="text-blue-700 mt-1">
-                                {faceShape.recommendation || "Upload an image to start."}
-                            </p>
-                        </div>
+                    <div className="bg-emerald-50 p-4 rounded-lg mb-4">
+                        <p className="text-sm font-medium text-emerald-800">Forma Detectada:</p>
+                        <p className="text-2xl font-bold text-emerald-700">{faceShape.shape || "--"}</p>
                     </div>
+
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                        <p className="text-sm font-medium text-blue-800">Recomendación:</p>
+                        <p className="text-blue-700">{faceShape.recommendation || "Sube una imagen para empezar."}</p>
+                    </div>
+
                 </div>
             </div>
         </div>
