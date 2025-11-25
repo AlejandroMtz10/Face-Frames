@@ -1,79 +1,120 @@
-// Basic face shape classification using 68 facial landmarks
+const distance = (p1, p2) =>
+    Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2);
 
-// Returns Euclidean distance between two points
-function dist(a, b) {
-    return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
-}
-
-export function calculateFaceShape(landmarks) {
-    if (!landmarks || landmarks.length < 68) return "Unknown";
-
-    const jawLeft = landmarks[4];
-    const jawRight = landmarks[12];
-    const cheekLeft = landmarks[2];
-    const cheekRight = landmarks[14];
-    const foreheadLeft = landmarks[19];
-    const foreheadRight = landmarks[24];
-    const chin = landmarks[8];
-    const top = landmarks[27];
-
-    const jawWidth = dist(jawLeft, jawRight);
-    const cheekWidth = dist(cheekLeft, cheekRight);
-    const foreheadWidth = dist(foreheadLeft, foreheadRight);
-    const faceHeight = dist(chin, top);
-
-    const jw = jawWidth / faceHeight;
-    const cw = cheekWidth / faceHeight;
-    const fw = foreheadWidth / faceHeight;
-    const ratio = faceHeight / foreheadWidth;
-
-    // Key new metric
-    const faceRatio = faceHeight / cheekWidth;
-
-    // Jaw curvature check
-    const jawCurve =
-        dist(landmarks[6], landmarks[8]) + dist(landmarks[10], landmarks[8]);
-
-    // --- Heart ---
-    if (fw > cw && fw > jw) return "Heart";
-
-    // --- Square ---
-    if (Math.abs(jw - fw) < 0.05 && Math.abs(fw - cw) < 0.05)
-        return "Square";
-
-    // --- Diamond ---
-    if (cw > fw && jw < fw * 0.9)
-        return "Diamond";
-
-    // --- Round vs Oval (improved) ---
-    if (cw > fw && cw > jw) {
-        if (faceRatio <= 1.25 && jawCurve <= cheekWidth * 1.05)
-            return "Round";     // short face + soft jaw
-        if (faceRatio > 1.25)
-            return "Oval";      // elongated face
+export function calculateFaceShape(landmarksData) {
+    if (!landmarksData?.positions || landmarksData.positions.length < 68) {
+        return "No face data available";
     }
 
-    if (ratio > 1.5) return "Oval";
-    else if (ratio > 1.3) return "Oblong/Large";
-    else if (ratio > 1.1) return "Square";
-    else return "Round";
+    const pts = landmarksData.positions; 
+
+    // Mapeo de Puntos (correcto)
+    const chinBottom = pts[8];
+    const chinLeft = pts[4];
+    const chinRight = pts[12];
+    const cheekLeft = pts[2];
+    const cheekRight = pts[14];
+    const browLeftOuter = pts[17];
+    const browRightOuter = pts[26];
+    const browLeftInner = pts[21];
+    const browRightInner = pts[22];
+    const noseLeft = pts[31];
+    const noseRight = pts[35];
+    const mouthLeft = pts[48];
+    const mouthRight = pts[54];
+
+    // Punto alto medio (entre cejas)
+    const pTop = {
+        x: (browLeftInner.x + browRightInner.x) / 2,
+        y: (browLeftInner.y + browRightInner.y) / 2
+    };
+
+    // ========== Medidas ==========
+    const totalHeight = distance(chinBottom, pTop);
+    const jawWidth = distance(chinLeft, chinRight);
+    const cheekWidth = distance(cheekLeft, cheekRight);
+    const foreheadWidth = distance(browLeftOuter, browRightOuter);
+    const mouthWidth = distance(mouthLeft, mouthRight);
+    const noseWidth = distance(noseLeft, noseRight);
+
+    const ratio = totalHeight / cheekWidth;
+
+    // ========== Sistema de puntaje ==========
+    const scores = {
+        Oval: 0, Square: 0, Round: 0,
+        Heart: 0, Oblong: 0, Diamond: 0
+    };
+
+    // ==================== ARBOL DE DECISION REFINADO ====================
+    
+    // Nivel 1: Proporción Larga/Ancho (El criterio más importante)
+    // ---------------------------------------------------------------
+    if (ratio > 1.45) {
+        scores.Oblong += 5; // Muy largo
+    } else if (ratio > 1.35) {
+        scores.Oval += 4;   // Ligeramente más largo que ancho
+    } else if (ratio >= 0.90) { // Si no es Oval o Oblong, es Round/Square (ratio <= 1.35)
+        scores.Round += 4;
+    }
+
+    // Nivel 2: Mandíbula vs. Pómulos
+    // ---------------------------------------------------------------
+    // Cuadrado/Rectangular: Mandíbula y pómulos de ancho similar
+    if (jawWidth >= cheekWidth * 0.90) { // 90% del ancho del pómulo
+        scores.Square += 3;
+    } 
+    // Corazón/Triángulo Invertido: Mandíbula estrecha
+    else if (jawWidth < cheekWidth * 0.85) { // Mandíbula estrecha (usamos 85% para no chocar con el 90%)
+        scores.Heart += 3;
+    }
+    
+    // Si la mandíbula es solo ligeramente más estrecha (85% - 90%), favorece Oval/Round
+
+    // Nivel 3: Frente vs. Pómulos (Diamond/Heart)
+    // ---------------------------------------------------------------
+    // Diamante: Pómulos significativamente más anchos que la frente.
+    if (cheekWidth > foreheadWidth * 1.15) { 
+        scores.Diamond += 2; 
+    } 
+    // Corazón: Frente significativamente más ancha que los pómulos.
+    if (foreheadWidth > cheekWidth * 1.10) {
+        scores.Heart += 1;
+    }
+
+    // Nivel 4: Nariz vs boca (característico de diamante)
+    // ---------------------------------------------------------------
+    if (noseWidth < mouthWidth * 0.85) {
+        scores.Diamond += 1;
+    }
+    
+    // Nivel 5: Refuerzo para Cuadrado (Ángulos)
+    // ---------------------------------------------------------------
+    // Usamos esta regla para reforzar la detección de "Square" en los casos borderline (ya que no podemos medir ángulos)
+    const cheeksEqualJaw = Math.abs(cheekWidth - jawWidth) < cheekWidth * 0.05; // Más estricto: 5%
+    if (cheeksEqualJaw) {
+        scores.Square += 1;
+    }
+
+
+    // ========== Elegir el de mayor puntaje ==========
+    return Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
 }
 
-
-// Eyeglass recommendations based on face shape
 export function getLensRecommendation(shape) {
     switch (shape) {
-        case "Round":
-            return "Choose angular or rectangular frames to add definition.";
         case "Oval":
-            return "Most frame styles work well. Try rectangular or cat-eye frames.";
+            return "La forma ideal. Casi cualquier montura funciona.";
+        case "Round":
+            return "Monturas cuadradas o rectangulares para añadir ángulos.";
         case "Square":
-            return "Use round or oval frames to soften the jawline.";
+            return "Monturas redondas u ovaladas para suavizar la mandíbula.";
         case "Heart":
-            return "Choose frames wider at the bottom or aviator styles.";
+            return "Monturas más anchas en la parte inferior o estilo aviador.";
+        case "Oblong":
+            return "Monturas grandes o gruesas para acortar el rostro.";
         case "Diamond":
-            return "Oval, rimless, or cat-eye frames help balance cheekbones.";
+            return "Monturas ovaladas o cat-eye para acentuar pómulos.";
         default:
-            return "Upload an image to get a personalized recommendation.";
+            return "Prueba monturas medianas y proporcionales.";
     }
 }
