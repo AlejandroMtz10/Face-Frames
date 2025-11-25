@@ -1,9 +1,6 @@
-// Basic face shape classification using 68 facial landmarks
+const distance = (p1, p2) =>
+    Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2);
 
-// Returns Euclidean distance between two points
-function dist(a, b) {
-    return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
-}
 
 export function calculateFaceShape(landmarks) {
     if (!landmarks || landmarks.length < 68) return "Unknown";

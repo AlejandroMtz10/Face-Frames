@@ -95,32 +95,46 @@ export default function ImageUploader() {
                 if (imageRef.current.complete) resolve();
                 else imageRef.current.onload = resolve;
             });
+            
+            // Usar la imagen del DOM
+            const imageElement = imageRef.current; 
 
-            // 🔵 USANDO tiny_face_detector
+            // 🔵 DETECCIÓN Y LANDMARKS
+            // Usamos un inputSize más grande para mejor detección si es necesario, pero 416 está bien.
             const detections = await faceapi
                 .detectAllFaces(
-                    imageRef.current,
+                    imageElement,
                     new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.5 })
                 )
                 .withFaceLandmarks();
 
             if (!detections.length) {
-                setError("No se detectó ningún rostro.");
+                setError("No se detectó ningún rostro en la imagen.");
                 return;
             }
 
+            // Mapeamos los puntos para tener solo el array de {x, y}
             const positions = detections[0].landmarks.positions.map((p) => ({
                 x: p.x,
                 y: p.y,
             }));
 
-            const shape = calculateFaceShape(positions);
+            // 🌟 ESTE ES EL CAMBIO CLAVE 🌟: 
+            // Crear el objeto que la función calculateFaceShape espera: { positions: [...] }
+            const landmarksDataForCalc = { positions: positions };
+
+            const shape = calculateFaceShape(landmarksDataForCalc);
             const recommendation = getLensRecommendation(shape);
 
             setFaceShape({ shape, recommendation });
+            
+            if (shape === "No face data available") {
+                setError("Error: No se obtuvieron los 68 puntos faciales para el cálculo. Intenta con una imagen más clara y frontal.");
+            }
+
         } catch (err) {
-            console.error(err);
-            setError("Error durante el análisis del rostro.");
+            console.error("Error durante el análisis:", err);
+            setError("Error interno durante el análisis del rostro.");
         } finally {
             setLoading(false);
         }
@@ -137,7 +151,7 @@ export default function ImageUploader() {
                             src={preview}
                             alt="analyze"
                             crossOrigin="anonymous"
-                            className="absolute opacity-0 pointer-events-none w-px h-px"
+                            className="absolute opacity-0 pointer-events-none w-px h-px" // <-- Aquí
                         />
                     )}
 
