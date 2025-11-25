@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import glassesImg from "../../Assets/pictures/glasses6.jpg";
+import glassesImg from "../../Assets/pictures/glasses6.webp";
 
 function MainCard() {
     const title = "Face Frames";
