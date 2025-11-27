@@ -13,7 +13,41 @@
         ],
         "pictures":[
             {
-
+                "glasses":"Glasses Square or Rectangle",
+                "picture":" pictures/glasses_Square&Rectangular_01.webp"
+            },{
+                "glasses":"Glasses Square or Rectangle",
+                "picture":" pictures/glasses_Square&Rectangular_02.webp"
+            },{
+                "glasses":"Glasses Square or Rectangle",
+                "picture":" pictures/glasses_Square&Rectangular_03.webp"
+            },{
+                "glasses":"Glasses Square or Rectangle",
+                "picture":" pictures/glasses_Square&Rectangular_04.webp"
+            },{
+                "glasses":"Glasses Round",
+                "picture":" pictures/glasses_Round_01.webp"
+            },{
+                "glasses":"Glasses Round",
+                "picture":" pictures/glasses_Round_02.webp"
+            },{
+                "glasses":"Glasses Cat Eye",
+                "picture":" pictures/glasses_Cat-eye_01.webp"
+            },{
+                "glasses":"Glasses Cat Eye",
+                "picture":" pictures/glasses_Cat-eye_02.webp"
+            },{
+                "glasses":"Glasses Aviator",
+                "picture":" pictures/glasses_aviator_01.webp"
+            },{
+                "glasses":"Glasses Aviator",
+                "picture":" pictures/glasses_aviator_02.webp"
+            },{
+                "glasses":"Glasses Browline",
+                "picture":" pictures/glasses_Browline_01.webp"
+            },{
+                "glasses":"Glasses Browline",
+                "picture":" pictures/glasses_Browline_02.webp"
             }
         ]
     },{
@@ -29,18 +63,79 @@
         ],
         "pictures":[
             {
-
+                "glasses":"Glasses Square or Rectangle",
+                "picture":" pictures/glasses_Square&Rectangular_01.webp"
+            },{
+                "glasses":"Glasses Square or Rectangle",
+                "picture":" pictures/glasses_Square&Rectangular_02.webp"
+            },{
+                "glasses":"Glasses Square or Rectangle",
+                "picture":" pictures/glasses_Square&Rectangular_03.webp"
+            },{
+                "glasses":"Glasses Square or Rectangle",
+                "picture":" pictures/glasses_Square&Rectangular_04.webp"
+            },{
+                "glasses":"Glasses Geometric",
+                "picture":" pictures/glasses_Geometric_01.webp"
+            },{
+                "glasses":"Glasses Geometric",
+                "picture":" pictures/glasses_Geometric_02.webp"
+            },{
+                "glasses":"Glasses Cat Eye",
+                "picture":" pictures/glasses_Cat-eye_01.webp"
+            },{
+                "glasses":"Glasses Cat Eye",
+                "picture":" pictures/glasses_Cat-eye_02.webp"
+            },{
+                "glasses":"Glasses Browline",
+                "picture":" pictures/glasses_Browline_01.webp"
+            },{
+                "glasses":"Glasses Browline",
+                "picture":" pictures/glasses_Browline_02.webp"
             }
         ]
     },{
         "name": "Square",
         "description": "A square face shape is characterized by a strong jawline, a broad forehead, and wide cheekbones. The width and length of the face are roughly equal, giving it a boxy appearance.",
-        "pictures":[
+        "glasses":[
             {
                 "Round and oval": "These shapes are ideal because the curves contrast with the sharp angles of a square face. Oval frames can be a good option, especially if they are wider than they are tall, as this helps balance the proportions.",
                 "Cat-eye": "These frames have a curved, upswept browline that complements the strong lines of a square face and draws attention to the eyes.",
                 "Browline": "These glasses highlight strong features without overwhelming them, creating a balanced look.",
                 "Aviator": "This style can also work for a square face by shining a light on its attributes." 
+            }
+        ],
+        "pictures":[
+            {
+                "glasses":"Glasses Round",
+                "picture":" pictures/glasses_Round_01.webp"
+            },{
+                "glasses":"Glasses Round",
+                "picture":" pictures/glasses_Round_02.webp"
+            },{
+                "glasses":"Glasses Oval",
+                "picture":" pictures/glasses_oval_01.webp"
+            },{
+                "glasses":"Glasses Oval",
+                "picture":" pictures/glasses_oval_02.webp"
+            },{
+                "glasses":"Glasses Cat Eye",
+                "picture":" pictures/glasses_Cat-eye_01.webp"
+            },{
+                "glasses":"Glasses Cat Eye",
+                "picture":" pictures/glasses_Cat-eye_02.webp"
+            },{
+                "glasses":"Glasses Aviator",
+                "picture":" pictures/glasses_aviator_01.webp"
+            },{
+                "glasses":"Glasses Aviator",
+                "picture":" pictures/glasses_aviator_02.webp"
+            },{
+                "glasses":"Glasses Browline",
+                "picture":" pictures/glasses_Browline_01.webp"
+            },{
+                "glasses":"Glasses Browline",
+                "picture":" pictures/glasses_Browline_02.webp"
             }
         ]
     },{
@@ -58,7 +153,53 @@
         ],
         "pictures":[
             {
-
+                "glasses":"Glasses Bottom Heavy Or Semi Rimless",
+                "picture":" pictures/glasses_Bottom-heavy_&_Semi-rimless_01.webp"
+            },{
+                "glasses":"Glasses Bottom Heavy Or Semi Rimless",
+                "picture":" pictures/glasses_Bottom-heavy_&_Semi-rimless_02.webp"
+            },{
+                "glasses":"Glasses Butterfly",
+                "picture":" pictures/glasses_Butterfly_01.webp"
+            },{
+                "glasses":"Glasses Butterfly",
+                "picture":" pictures/glasses_Butterfly_02.webp"
+            },{
+                "glasses":"Glasses Cat Eye",
+                "picture":" pictures/glasses_Cat-eye_01.webp"
+            },{
+                "glasses":"Glasses Cat Eye",
+                "picture":" pictures/glasses_Cat-eye_02.webp"
+            },{
+                "glasses":"Glasses Round",
+                "picture":" pictures/glasses_Round_01.webp"
+            },{
+                "glasses":"Glasses Round",
+                "picture":" pictures/glasses_Round_02.webp"
+            },{
+                "glasses":"Glasses Square or Rectangle",
+                "picture":" pictures/glasses_Square&Rectangular_01.webp"
+            },{
+                "glasses":"Glasses Square or Rectangle",
+                "picture":" pictures/glasses_Square&Rectangular_02.webp"
+            },{
+                "glasses":"Glasses Square or Rectangle",
+                "picture":" pictures/glasses_Square&Rectangular_03.webp"
+            },{
+                "glasses":"Glasses Square or Rectangle",
+                "picture":" pictures/glasses_Square&Rectangular_04.webp"
+            },{
+                "glasses":"Glasses Aviator",
+                "picture":" pictures/glasses_aviator_01.webp"
+            },{
+                "glasses":"Glasses Aviator",
+                "picture":" pictures/glasses_aviator_02.webp"
+            },{
+                "glasses":"Glasses Oval",
+                "picture":" pictures/glasses_oval_01.webp"
+            },{
+                "glasses":"Glasses Oval",
+                "picture":" pictures/glasses_oval_02.webp"
             }
         ]
     },{
@@ -76,7 +217,41 @@
         ],
         "pictures":[
             {
-
+                "glasses":"Glasses Oval",
+                "picture":" pictures/glasses_oval_01.webp"
+            },{
+                "glasses":"Glasses Oval",
+                "picture":" pictures/glasses_oval_02.webp"
+            },{
+                "glasses":"Glasses Round",
+                "picture":" pictures/glasses_Round_01.webp"
+            },{
+                "glasses":"Glasses Round",
+                "picture":" pictures/glasses_Round_02.webp"
+            },{
+                "glasses":"Glasses Butterfly",
+                "picture":" pictures/glasses_Butterfly_01.webp"
+            },{
+                "glasses":"Glasses Butterfly",
+                "picture":" pictures/glasses_Butterfly_02.webp"
+            },{
+                "glasses":"Glasses Cat Eye",
+                "picture":" pictures/glasses_Cat-eye_01.webp"
+            },{
+                "glasses":"Glasses Cat Eye",
+                "picture":" pictures/glasses_Cat-eye_02.webp"
+            },{
+                "glasses":"Glasses Oversized",
+                "picture":" pictures/glasses_Oversized_01.webp"
+            },{
+                "glasses":"Glasses Oversized",
+                "picture":" pictures/glasses_Oversized_02.webp"
+            },{
+                "glasses":"Glasses Aviator",
+                "picture":" pictures/glasses_aviator_01.webp"
+            },{
+                "glasses":"Glasses Aviator",
+                "picture":" pictures/glasses_aviator_02.webp"
             }
         ]
     },{
@@ -93,7 +268,35 @@
         ],
         "pictures":[
             {
-
+                "glasses":"Glasses Tall Square or Rectangle",
+                "picture":" pictures/glasses_Tall_Square_or_Rectangular_01.webp"
+            },{
+                "glasses":"Glasses Tall Square or Rectangle",
+                "picture":" pictures/glasses_Tall_Square_or_Rectangular_02.webp"
+            },{
+                "glasses":"Glasses Aviator",
+                "picture":" pictures/glasses_aviator_01.webp"
+            },{
+                "glasses":"Glasses Aviator",
+                "picture":" pictures/glasses_aviator_02.webp"
+            },{
+                "glasses":"Glasses Geometric",
+                "picture":" pictures/glasses_Geometric_01.webp"
+            },{
+                "glasses":"Glasses Geometric",
+                "picture":" pictures/glasses_Geometric_02.webp"
+            },{
+                "glasses":"Glasses Oversized",
+                "picture":" pictures/glasses_Oversized_01.webp"
+            },{
+                "glasses":"Glasses Oversized",
+                "picture":" pictures/glasses_Oversized_02.webp"
+            },{
+                "glasses":"Glasses Cat Eye",
+                "picture":" pictures/glasses_Cat-eye_01.webp"
+            },{
+                "glasses":"Glasses Cat Eye",
+                "picture":" pictures/glasses_Cat-eye_02.webp"
             }
         ]
     }
