@@ -2,99 +2,98 @@
     {
         "id":1,
         "glasses":"Glasses Bottom Heavy Or Semi Rimless",
-        "picture":"../assets/pictures/glasses_Bottom-heavy_&_Semi-rimless_01.webp"
+        "picture":" pictures/glasses_Bottom-heavy_&_Semi-rimless_01.webp"
     },{
         "id":2,
         "glasses":"Glasses Bottom Heavy Or Semi Rimless",
-        "picture":"../assets/pictures/glasses_Bottom-heavy_&_Semi-rimless_02.webp"
+        "picture":" pictures/glasses_Bottom-heavy_&_Semi-rimless_02.webp"
     },{
         "id":3,
         "glasses":"Glasses Browline",
-        "picture":"../assets/pictures/glasses_Browline_01.webp"
+        "picture":" pictures/glasses_Browline_01.webp"
     },{
         "id":4,
         "glasses":"Glasses Browline",
-        "picture":"../assets/pictures/glasses_Browline_02.webp"
+        "picture":" pictures/glasses_Browline_02.webp"
     },{
         "id":5,
         "glasses":"Glasses Butterfly",
-        "picture":"../assets/pictures/glasses_Butterfly_01.webp"
-    }
-    ,{
+        "picture":" pictures/glasses_Butterfly_01.webp"
+    },{
         "id":6,
         "glasses":"Glasses Butterfly",
-        "picture":"../assets/pictures/glasses_Butterfly_02.webp"
+        "picture":" pictures/glasses_Butterfly_02.webp"
     },{
         "id":7,
         "glasses":"Glasses Cat Eye",
-        "picture":"../assets/pictures/glasses_Cat-eye_01.webp"
+        "picture":" pictures/glasses_Cat-eye_01.webp"
     },{
         "id":8,
         "glasses":"Glasses Cat Eye",
-        "picture":"../assets/pictures/glasses_Cat-eye_02.webp"
+        "picture":" pictures/glasses_Cat-eye_02.webp"
     },{
         "id":9,
         "glasses":"Glasses Geometric",
-        "picture":"../assets/pictures/glasses_Geometric_01.webp"
+        "picture":" pictures/glasses_Geometric_01.webp"
     },{
         "id":10,
         "glasses":"Glasses Geometric",
-        "picture":"../assets/pictures/glasses_Geometric_02.webp"
+        "picture":" pictures/glasses_Geometric_02.webp"
     },{
         "id":11,
         "glasses":"Glasses Oversized",
-        "picture":"../assets/pictures/glasses_Oversized_01.webp"
+        "picture":" pictures/glasses_Oversized_01.webp"
     },{
         "id":12,
         "glasses":"Glasses Oversized",
-        "picture":"../assets/pictures/glasses_Oversized_02.webp"
+        "picture":" pictures/glasses_Oversized_02.webp"
     },{
         "id":13,
         "glasses":"Glasses Round",
-        "picture":"../assets/pictures/glasses_Round_01.webp"
+        "picture":" pictures/glasses_Round_01.webp"
     },{
         "id":14,
         "glasses":"Glasses Round",
-        "picture":"../assets/pictures/glasses_Round_02.webp"
+        "picture":" pictures/glasses_Round_02.webp"
     },{
         "id":15,
         "glasses":"Glasses Square or Rectangle",
-        "picture":"../assets/pictures/glasses_Square&Rectangular_01.webp"
+        "picture":" pictures/glasses_Square&Rectangular_01.webp"
     },{
         "id":16,
         "glasses":"Glasses Square or Rectangle",
-        "picture":"../assets/pictures/glasses_Square&Rectangular_02.webp"
+        "picture":" pictures/glasses_Square&Rectangular_02.webp"
     },{
         "id":17,
         "glasses":"Glasses Square or Rectangle",
-        "picture":"../assets/pictures/glasses_Square&Rectangular_03.webp"
+        "picture":" pictures/glasses_Square&Rectangular_03.webp"
     },{
         "id":18,
         "glasses":"Glasses Square or Rectangle",
-        "picture":"../assets/pictures/glasses_Square&Rectangular_04.webp"
+        "picture":" pictures/glasses_Square&Rectangular_04.webp"
     },{
         "id":19,
         "glasses":"Glasses Tall Square or Rectangle",
-        "picture":"../assets/pictures/glasses_Tall_Square_or_Rectangular_01.webp"
+        "picture":" pictures/glasses_Tall_Square_or_Rectangular_01.webp"
     },{
         "id":20,
         "glasses":"Glasses Tall Square or Rectangle",
-        "picture":"../assets/pictures/glasses_Tall_Square_or_Rectangular_02.webp"
+        "picture":" pictures/glasses_Tall_Square_or_Rectangular_02.webp"
     },{
         "id":21,
         "glasses":"Glasses Aviator",
-        "picture":"../assets/pictures/glasses_aviator_01.webp"
+        "picture":" pictures/glasses_aviator_01.webp"
     },{
         "id":22,
         "glasses":"Glasses Aviator",
-        "picture":"../assets/pictures/glasses_aviator_02.webp"
+        "picture":" pictures/glasses_aviator_02.webp"
     },{
         "id":23,
         "glasses":"Glasses Oval",
-        "picture":"../assets/pictures/glasses_oval_01.webp"
+        "picture":" pictures/glasses_oval_01.webp"
     },{
         "id":24,
         "glasses":"Glasses Oval",
-        "picture":"../assets/pictures/glasses_oval_02.webp"
+        "picture":" pictures/glasses_oval_02.webp"
     }
 ]

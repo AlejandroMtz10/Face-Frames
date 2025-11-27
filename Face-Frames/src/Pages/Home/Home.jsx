@@ -1,6 +1,7 @@
 import React from "react";
 import Carousel from "../../Components/Carousel";
 import MainCard from "../../Components/MainCard";
+import Glasses from "../../Components/Glasses";
 function Home() {
     return (
         <div>
@@ -8,12 +9,18 @@ function Home() {
             <p className="text-center text-lg mx-4">
                 Discover the perfect glasses for your face based on the shape of your face.
             </p>
-            <div className="p-4">
+            <section className="p-4">
                 <Carousel />
-            </div>
-            <div className="px-4 py-2">
+            </section>
+            <section className="px-4 py-2">
                 <MainCard />
-            </div>
+            </section>
+            <section className="px-4 pt-6 pb-2">
+                <h2 className="text-3xl text-center font-semibold mb-4 text-emerald-900 dark:text-white">
+                    Kind of glasses
+                </h2>
+                <Glasses className="pt-2" />
+            </section>
         </div>
     );
 }
