@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
-import { calculateFaceShape, getLensRecommendation } from "../../utils/face_shape.jsx";
+import { calculateFaceShape } from "../../utils/face_shape.jsx";
+import DetectedShape from "../DetectedShape";
 import { FiUploadCloud } from "react-icons/fi";
 import { TbLoader2 } from "react-icons/tb";
 
@@ -12,27 +13,26 @@ export default function ImageUploader() {
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [modelsLoaded, setModelsLoaded] = useState(false);
-    const [faceShape, setFaceShape] = useState({ shape: null, recommendation: null });
+    const [faceShape, setFaceShape] = useState({ shape: null });
     const [error, setError] = useState(null);
     const [isDragging, setIsDragging] = useState(false);
 
     const imageRef = useRef(null);
 
-    // Cargar modelos SOLO una vez
+    // Upload models
     useEffect(() => {
         const loadModels = async () => {
             setLoading(true);
 
             try {
-                // SOLO los modelos que tú tienes descargados
+                // Just load the Tiny Face Detector and Face Landmark models
                 await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
                 await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
 
-                console.log("Modelos tiny + landmarks cargados correctamente");
                 setModelsLoaded(true);
             } catch (err) {
-                console.error("Error al cargar modelos:", err);
-                setError("No se pudieron cargar los modelos. Verifica /public/models.");
+                console.error("Error loading models:", err);
+                setError("Failed to load models. Check /public/models.");
             } finally {
                 setLoading(false);
             }
@@ -77,14 +77,14 @@ export default function ImageUploader() {
         setIsDragging(false);
     };
 
-    // ANALIZAR ROSTRO
+    // Analyze the image
     const handleAnalyze = async () => {
         if (!file || !imageRef.current) {
-            return setError("Selecciona una imagen primero.");
+            return setError("Please select an image first.");
         }
 
         if (!modelsLoaded) {
-            return setError("Los modelos aún se están cargando.");
+            return setError("Models are still loading.");
         }
 
         setLoading(true);
@@ -96,11 +96,11 @@ export default function ImageUploader() {
                 else imageRef.current.onload = resolve;
             });
             
-            // Usar la imagen del DOM
+            // Use the image from the DOM
             const imageElement = imageRef.current; 
 
-            // 🔵 DETECCIÓN Y LANDMARKS
-            // Usamos un inputSize más grande para mejor detección si es necesario, pero 416 está bien.
+            // DETECTION AND LANDMARKS
+            // We use a larger inputSize for better detection if needed, but 416 is fine.
             const detections = await faceapi
                 .detectAllFaces(
                     imageElement,
@@ -113,28 +113,25 @@ export default function ImageUploader() {
                 return;
             }
 
-            // Mapeamos los puntos para tener solo el array de {x, y}
+            // Map the points to have only the array of {x, y}
             const positions = detections[0].landmarks.positions.map((p) => ({
                 x: p.x,
                 y: p.y,
             }));
 
-            // 🌟 ESTE ES EL CAMBIO CLAVE 🌟: 
-            // Crear el objeto que la función calculateFaceShape espera: { positions: [...] }
+            // Create the object that the calculateFaceShape function expects: { positions: [...] }
             const landmarksDataForCalc = { positions: positions };
 
             const shape = calculateFaceShape(landmarksDataForCalc);
-            const recommendation = getLensRecommendation(shape);
+            setFaceShape({ shape });
 
-            setFaceShape({ shape, recommendation });
-            
             if (shape === "No face data available") {
-                setError("Error: No se obtuvieron los 68 puntos faciales para el cálculo. Intenta con una imagen más clara y frontal.");
+                setError("Error: Could not obtain all 68 facial points for calculation. Try a clearer, frontal image.");
             }
 
         } catch (err) {
-            console.error("Error durante el análisis:", err);
-            setError("Error interno durante el análisis del rostro.");
+            console.error("Error during analysis:", err);
+            setError("Internal error during face analysis.");
         } finally {
             setLoading(false);
         }
@@ -151,11 +148,11 @@ export default function ImageUploader() {
                             src={preview}
                             alt="analyze"
                             crossOrigin="anonymous"
-                            className="absolute opacity-0 pointer-events-none w-px h-px" // <-- Aquí
+                            className="absolute opacity-0 pointer-events-none w-px h-px" 
                         />
                     )}
 
-                    {/* Área de carga */}
+                    {/* Upload area */}
                     <div className="mb-8 flex flex-col items-center">
                         <div
                             onDrop={handleDrop}
@@ -175,7 +172,7 @@ export default function ImageUploader() {
                                 </div>
 
                                 <p className="text-gray-700 dark:text-white text-lg font-semibold">
-                                    {preview ? "Imagen Seleccionada" : "Haz clic o arrastra una imagen"}
+                                    {preview ? "Picture Selected" : "Click or drag an image"}
                                 </p>
                             </label>
 
@@ -189,7 +186,7 @@ export default function ImageUploader() {
                         </div>
                     </div>
 
-                    {/* Botón de análisis */}
+                    {/* Analyze button */}
                     <button
                         onClick={handleAnalyze}
                         disabled={loading || !file || !modelsLoaded}
@@ -198,14 +195,14 @@ export default function ImageUploader() {
                         {loading ? (
                             <span className="flex items-center justify-center">
                                 <TbLoader2 className="h-5 w-5 animate-spin mr-2" />
-                                Procesando...
+                                Processing...
                             </span>
                         ) : (
-                            "Analizar Rostro"
+                            "Analyze Face"
                         )}
                     </button>
 
-                    {/* Resultado */}
+                    {/* Result */}
                     {error && (
                         <div className="bg-red-100 p-4 rounded-lg border border-red-300 mb-4">
                             <p className="text-red-700 font-semibold">{error}</p>
@@ -213,13 +210,12 @@ export default function ImageUploader() {
                     )}
 
                     <div className="bg-emerald-50 p-4 rounded-lg mb-4">
-                        <p className="text-sm font-medium text-emerald-800">Forma Detectada:</p>
+                        <p className="text-sm font-medium text-emerald-800">Detected Shape:</p>
                         <p className="text-2xl font-bold text-emerald-700">{faceShape.shape || "--"}</p>
                     </div>
 
-                    <div className="bg-blue-50 p-4 rounded-lg">
-                        <p className="text-sm font-medium text-blue-800">Recomendación:</p>
-                        <p className="text-blue-700">{faceShape.recommendation || "Sube una imagen para empezar."}</p>
+                    <div className="text-center mt-6 flex flex-col items-center gap-6 px-4">
+                        {faceShape.shape && <DetectedShape detectedShape={faceShape.shape} />}
                     </div>
 
                 </div>

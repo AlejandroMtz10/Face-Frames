@@ -19,6 +19,9 @@ function Home() {
                 <h2 className="text-3xl text-center font-semibold mb-4 text-emerald-900 dark:text-white">
                     Kind of glasses
                 </h2>
+
+                <hr className="my-8 mx-12 h-px bg-emerald-900 border-0 dark:bg-emerald-300" />
+                
                 <Glasses className="pt-2" />
             </section>
         </div>
