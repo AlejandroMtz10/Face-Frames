@@ -25,9 +25,12 @@ export default function ImageUploader() {
             setLoading(true);
 
             try {
-                // Just load the Tiny Face Detector and Face Landmark models
-                await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-                await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+                await Promise.all([
+                    faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+                    faceapi.nets.ssdMobilenetv1.loadFromUri('/models'),
+                    faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+                ]);
+
 
                 setModelsLoaded(true);
             } catch (err) {
@@ -79,54 +82,47 @@ export default function ImageUploader() {
 
     // Analyze the image
     const handleAnalyze = async () => {
-        if (!file || !imageRef.current) {
-            return setError("Please select an image first.");
+        if (!file) {
+            setError("Please select an image first.");
+            return;
         }
 
         if (!modelsLoaded) {
-            return setError("Models are still loading.");
+            setError("Models are still loading.");
+            return;
         }
 
         setLoading(true);
         setError(null);
 
         try {
-            await new Promise((resolve) => {
-                if (imageRef.current.complete) resolve();
-                else imageRef.current.onload = resolve;
-            });
-            
-            // Use the image from the DOM
-            const imageElement = imageRef.current; 
+            // Convertir archivo a imagen
+            const img = await faceapi.bufferToImage(file);
+            imageRef.current = img;
 
-            // DETECTION AND LANDMARKS
-            // We use a larger inputSize for better detection if needed, but 416 is fine.
-            const detections = await faceapi
-                .detectAllFaces(
-                    imageElement,
-                    new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.5 })
-                )
+            // Detectar una sola cara con SSD
+            const detection = await faceapi
+                .detectSingleFace(img)
                 .withFaceLandmarks();
 
-            if (!detections.length) {
+            if (!detection) {
                 setError("No se detectó ningún rostro en la imagen.");
                 return;
             }
 
-            // Map the points to have only the array of {x, y}
-            const positions = detections[0].landmarks.positions.map((p) => ({
+            // Obtener puntos
+            const positions = detection.landmarks.positions.map(p => ({
                 x: p.x,
                 y: p.y,
             }));
 
-            // Create the object that the calculateFaceShape function expects: { positions: [...] }
-            const landmarksDataForCalc = { positions: positions };
+            const landmarksDataForCalc = { positions };
 
             const shape = calculateFaceShape(landmarksDataForCalc);
             setFaceShape({ shape });
 
             if (shape === "No face data available") {
-                setError("Error: Could not obtain all 68 facial points for calculation. Try a clearer, frontal image.");
+                setError("Error: Could not obtain all 68 landmarks.");
             }
 
         } catch (err) {
@@ -137,18 +133,18 @@ export default function ImageUploader() {
         }
     };
 
+
+
     return (
         <div className="flex items-center justify-center p-4 font-sans w-full">
             <div className="w-full max-w-2xl">
                 <div className="bg-white dark:bg-emerald-900 rounded-xl shadow-2xl p-6 sm:p-8 border border-gray-200">
 
                     {preview && (
-                        <img
+                        <img 
                             ref={imageRef}
-                            src={preview}
-                            alt="analyze"
-                            crossOrigin="anonymous"
-                            className="absolute opacity-0 pointer-events-none w-px h-px" 
+                            alt="hidden-face" 
+                            style={{ display: "none" }} 
                         />
                     )}
 

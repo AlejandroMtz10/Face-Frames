@@ -1,107 +1,173 @@
 import shapeData from "../Data-json/shape-face.json";
 
-const distance = (p1, p2) =>
-    Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2);
+const DEBUG = false; // set true to print numbers for tuning
 
-export function calculateFaceShape(landmarks) {
-    if (!landmarks || !landmarks.positions || landmarks.positions.length < 68) {
-        return "No face data available";
-    }
+const distance = (a, b) =>
+  Math.hypot(b.x - a.x, b.y - a.y);
 
-    const pts = landmarks.positions;
+// angle at b formed by a-b-c (degrees)
+const angleDeg = (a, b, c) => {
+  const abx = a.x - b.x, aby = a.y - b.y;
+  const cbx = c.x - b.x, cby = c.y - b.y;
+  const dot = abx * cbx + aby * cby;
+  const ma = Math.hypot(abx, aby);
+  const mc = Math.hypot(cbx, cby);
+  if (ma === 0 || mc === 0) return 180;
+  const cos = Math.max(-1, Math.min(1, dot / (ma * mc)));
+  return Math.acos(cos) * (180 / Math.PI);
+};
 
-    // ========== POINTS ==========
-    const chinBottom = pts[8];
-    const chinLeft = pts[4];
-    const chinRight = pts[12];
+export function calculateFaceShape(data) {
+  if (!data?.positions || data.positions.length < 68) return "No face data available";
+  const p = data.positions;
 
-    const browLeftOuter = pts[17];
-    const browRightOuter = pts[26];
+  // Robust selectors (averages / multiple points)
+  const chin = p[8];
+  const topMid = { // approx top using inner brows average
+    x: (p[21].x + p[22].x) / 2,
+    y: (p[21].y + p[22].y) / 2,
+  };
 
-    const browLeftInner = pts[21];
-    const browRightInner = pts[22];
+  // approximate cheek "width" by averaging two symmetric pairs (2/14 and 3/13)
+  const cheekLeftPts = [p[2], p[3]];
+  const cheekRightPts = [p[14], p[13]];
+  const cheekLeft = {
+    x: (cheekLeftPts[0].x + cheekLeftPts[1].x) / 2,
+    y: (cheekLeftPts[0].y + cheekLeftPts[1].y) / 2,
+  };
+  const cheekRight = {
+    x: (cheekRightPts[0].x + cheekRightPts[1].x) / 2,
+    y: (cheekRightPts[0].y + cheekRightPts[1].y) / 2,
+  };
 
-    const cheekLeft = pts[2];
-    const cheekRight = pts[14];
+  // jaw endpoints average (4 and 12 are good)
+  const jawLeft = p[4];
+  const jawRight = p[12];
 
-    const pTop = {
-        x: (browLeftInner.x + browRightInner.x) / 2,
-        y: (browLeftInner.y + browRightInner.y) / 2,
-    };
+  // forehead approximation using brow outer ends (17 and 26)
+  const browLeftOuter = p[17];
+  const browRightOuter = p[26];
 
-    // ========== MEASUREMENTS ==========
-    const totalHeight = distance(chinBottom, pTop);
-    const jawWidth = distance(chinLeft, chinRight);
-    const cheekWidth = distance(cheekLeft, cheekRight);
-    const foreheadWidth = distance(browLeftOuter, browRightOuter);
+  // face width baseline (points 0 and 16)
+  const faceWidth = distance(p[0], p[16]);
 
-    const ratio = totalHeight / cheekWidth;
+  // Distances
+  const faceHeight = distance(chin, topMid);
+  const jawWidth = distance(jawLeft, jawRight);
+  const cheekWidth = distance(cheekLeft, cheekRight);
+  const foreheadWidth = distance(browLeftOuter, browRightOuter);
 
-    // ========== SCORING SYSTEM ==========
-    const scores = {
-        Oval: 0,
-        Round: 0,
-        Square: 0,
-        Heart: 0,
-        Diamond: 0,
-        Oblong: 0,
-    };
+  // Normalize by faceWidth to reduce scale/camera effects
+  const nFaceHeight = faceHeight / faceWidth;
+  const nJaw = jawWidth / faceWidth;
+  const nCheek = cheekWidth / faceWidth;
+  const nForehead = foreheadWidth / faceWidth;
 
-    // ========== OVAL ==========
-    if (ratio > 1.3 && ratio < 1.55) scores.Oval++;
-    if (cheekWidth > jawWidth) scores.Oval++;
-    if (foreheadWidth >= cheekWidth * 0.95) scores.Oval++;
+  // jaw angle (soft vs angular)
+  const jawAngle = angleDeg(p[4], p[8], p[12]); // angle at chin using jaw points
 
-    // ========== ROUND ==========
-    if (ratio >= 0.9 && ratio <= 1.2) scores.Round++;
-    if (Math.abs(cheekWidth - jawWidth) <= cheekWidth * 0.10) scores.Round++;
-    if (Math.abs(foreheadWidth - cheekWidth) <= cheekWidth * 0.10) scores.Round++;
+  // scores object
+  const scores = {
+    Oval: 0,
+    Round: 0,
+    Square: 0,
+    Heart: 0,
+    Diamond: 0,
+    Oblong: 0,
+    Triangle: 0, // jaw-dominant (optional)
+  };
 
-    // ========== SQUARE ==========
-    if (ratio >= 0.9 && ratio <= 1.2) scores.Square++;
-    if (jawWidth >= cheekWidth * 0.95) scores.Square++;
-    if (foreheadWidth >= cheekWidth * 0.95) scores.Square++;
+  // Weights / thresholds (tunable)
+  // NOTE: thresholds are normalized (faceWidth = 1)
+  // Dominance thresholds require at least 8% difference to count
+  const DOM = 0.08;
 
-    // ========== HEART ==========
-    if (foreheadWidth > cheekWidth * 1.05) scores.Heart++;
-    if (jawWidth < cheekWidth * 0.85) scores.Heart++;
-    if (ratio > 1.2) scores.Heart++;
+  // --------------------------------------------------
+  // Diamond: cheek >> forehead AND cheek >> jaw
+  if (nCheek > nForehead * (1 + DOM) && nCheek > nJaw * (1 + DOM)) {
+    scores.Diamond += 3;
+  }
+  if (nCheek > nForehead * 1.06) scores.Diamond += 1;
+  if (nCheek > nJaw * 1.06) scores.Diamond += 1;
 
-    // ========== DIAMOND ==========
-    if (cheekWidth > foreheadWidth * 1.10) scores.Diamond++;
-    if (cheekWidth > jawWidth * 1.12) scores.Diamond++;
-    if (ratio >= 1.0 && ratio <= 1.4) scores.Diamond++;
+  // --------------------------------------------------
+  // Heart: forehead dominant & narrow jaw
+  if (nForehead > nCheek * (1 + DOM) && nJaw < nCheek * (1 - DOM)) {
+    scores.Heart += 3;
+  }
+  if (nForehead > nCheek * 1.06) scores.Heart += 1;
+  if (nJaw < nCheek * 0.9) scores.Heart += 1;
 
-    // ========== OBLONG ==========
-    if (ratio > 1.45) scores.Oblong++;
-    if (Math.abs(cheekWidth - foreheadWidth) <= cheekWidth * 0.10) scores.Oblong++;
-    if (jawWidth < cheekWidth) scores.Oblong++;
+  // --------------------------------------------------
+  // Triangle (jaw dominant)
+  if (nJaw > nCheek * (1 + DOM) && nJaw > nForehead * (1 + DOM)) {
+    scores.Triangle += 3;
+  }
+  if (nJaw > nCheek * 1.06) scores.Triangle += 1;
 
-    // ========== SELECT BEST ==========
-    const bestShape = Object.keys(scores).reduce((a, b) =>
-        scores[a] > scores[b] ? a : b
-    );
+  // --------------------------------------------------
+  // Oblong: height significantly larger than width
+  if (nFaceHeight > 1.55) scores.Oblong += 3;
+  if (nFaceHeight > 1.45) scores.Oblong += 1;
 
-    if (scores[bestShape] === 0) return "Inconclusive";
+  // --------------------------------------------------
+  // Oval: medium-high height and soft jaw
+  if (nFaceHeight > 1.30 && nFaceHeight <= 1.55) scores.Oval += 2;
+  if (jawAngle > 116) scores.Oval += 1; // softer jaw adds to oval
 
-    return bestShape;
+  // --------------------------------------------------
+  // Round: height ~ width and soft jaw
+  if (nFaceHeight >= 0.95 && nFaceHeight <= 1.25) scores.Round += 2;
+  if (jawAngle > 116 && Math.abs(nCheek - nJaw) <= 0.08) scores.Round += 1;
+
+  // --------------------------------------------------
+  // Square: width similar across forehead/cheek/jaw and jaw angle sharp
+  if (
+    Math.abs(nJaw - nCheek) <= 0.06 &&
+    Math.abs(nForehead - nCheek) <= 0.08 &&
+    jawAngle < 112
+  ) {
+    scores.Square += 3;
+  }
+  if (jawAngle < 112 && Math.abs(nJaw - nCheek) <= 0.10) scores.Square += 1;
+
+  // --------------------------------------------------
+  // Tiebreakers & small bonuses
+  if (nCheek > nJaw && nCheek > nForehead) scores.Diamond += 0.5;
+  if (nForehead > nCheek && nForehead > nJaw) scores.Heart += 0.5;
+  if (nJaw > nCheek && nJaw > nForehead) scores.Triangle += 0.5;
+
+  // DEBUG print
+  if (DEBUG) {
+    // eslint-disable-next-line no-console
+    console.log("face metrics (normalized):", {
+      nFaceHeight, nJaw, nCheek, nForehead, jawAngle, scores
+    });
+  }
+
+  // Pick highest score
+  const winner = Object.keys(scores).reduce((a, b) =>
+    scores[a] >= scores[b] ? a : b
+  );
+
+  // final safety: if winner has 0 score -> fallback by ratio
+  if (scores[winner] === 0) {
+    if (nFaceHeight > 1.45) return "Oval";
+    if (nFaceHeight < 1.15) return "Round";
+    return "Inconclusive";
+  }
+
+  return winner;
 }
 
 export function getFaceShapeData(shape) {
-    if (!shape) return null;
-
-    // Search in your JSON by exact name
-    const result = shapeData.find((item) => item.name === shape);
-
-    // If nothing is found
-    if (!result) {
-        return {
-            name: shape,
-            description: "No data found for this face shape.",
-            glasses: [],
-            pictures: [],
-        };
-    }
-
-    return result;
+  if (!shape) return null;
+  const res = shapeData.find((s) => s.name === shape);
+  if (!res) return {
+    name: shape,
+    description: "No data found.",
+    glasses: [],
+    pictures: []
+  };
+  return res;
 }
