@@ -13,7 +13,7 @@ export default function DetectedShape({ detectedShape }) {
 
     const shapeInfo = getShapeInfo(detectedShape);
 
-    if (!shapeInfo) return <p>No hay datos para esta forma de rostro.</p>;
+    if (!shapeInfo) return <p>There´s no data for this face shape.</p>;
 
     return (
         <div className="mt-6">
