@@ -6,8 +6,6 @@ import { TbLoader2 } from "react-icons/tb";
 
 import * as faceapi from "face-api.js";
 
-const MODEL_URL = "/models";
-
 export default function ImageUploader() {
     const [preview, setPreview] = useState(null);
     const [file, setFile] = useState(null);
@@ -19,23 +17,21 @@ export default function ImageUploader() {
 
     const imageRef = useRef(null);
 
-    // Upload models
+    // Load models once
     useEffect(() => {
         const loadModels = async () => {
-            setLoading(true);
-
             try {
-                await Promise.all([
-                    faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-                    faceapi.nets.ssdMobilenetv1.loadFromUri('/models'),
-                    faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
-                ]);
+                setLoading(true);
 
+                await Promise.all([
+                    faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
+                    faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+                ]);
 
                 setModelsLoaded(true);
             } catch (err) {
-                console.error("Error loading models:", err);
-                setError("Failed to load models. Check /public/models.");
+                console.error("Model load error:", err);
+                setError("No se pudieron cargar los modelos. Verifica /public/models.");
             } finally {
                 setLoading(false);
             }
@@ -49,20 +45,17 @@ export default function ImageUploader() {
 
         const validTypes = ["image/jpeg", "image/png", "image/webp"];
         if (!validTypes.includes(selectedFile.type)) {
-            setError("Formato de archivo no compatible.");
-            setPreview(null);
+            setError("Formato no compatible.");
             return;
         }
 
         setFile(selectedFile);
         setPreview(URL.createObjectURL(selectedFile));
         setError(null);
-        setFaceShape({ shape: null, recommendation: null });
+        setFaceShape({ shape: null });
     }, []);
 
-    const handleImageChange = (e) => {
-        processFile(e.target.files[0]);
-    };
+    const handleImageChange = (e) => processFile(e.target.files[0]);
 
     const handleDrop = (e) => {
         e.preventDefault();
@@ -70,147 +63,118 @@ export default function ImageUploader() {
         processFile(e.dataTransfer.files[0]);
     };
 
-    const handleDragOver = (e) => {
-        e.preventDefault();
-        setIsDragging(true);
-    };
-
-    const handleDragLeave = (e) => {
-        e.preventDefault();
-        setIsDragging(false);
-    };
-
-    // Analyze the image
     const handleAnalyze = async () => {
-        if (!file) {
-            setError("Please select an image first.");
-            return;
-        }
-
-        if (!modelsLoaded) {
-            setError("Models are still loading.");
-            return;
-        }
+        if (!file) return setError("Selecciona una imagen primero.");
+        if (!modelsLoaded) return setError("Modelos aún cargándose...");
 
         setLoading(true);
         setError(null);
 
         try {
-            // Convertir archivo a imagen
             const img = await faceapi.bufferToImage(file);
             imageRef.current = img;
 
-            // Detectar una sola cara con SSD
+            const options = new faceapi.SsdMobilenetv1Options({
+                minConfidence: 0.5,
+            });
+
             const detection = await faceapi
-                .detectSingleFace(img)
+                .detectSingleFace(img, options)
                 .withFaceLandmarks();
 
             if (!detection) {
-                setError("No se detectó ningún rostro en la imagen.");
+                setError("No se detectó ningún rostro.");
                 return;
             }
 
-            // Obtener puntos
-            const positions = detection.landmarks.positions.map(p => ({
+            const positions = detection.landmarks.positions.map((p) => ({
                 x: p.x,
                 y: p.y,
             }));
 
-            const landmarksDataForCalc = { positions };
+            const shape = calculateFaceShape({ positions });
 
-            const shape = calculateFaceShape(landmarksDataForCalc);
             setFaceShape({ shape });
-
-            if (shape === "No face data available") {
-                setError("Error: Could not obtain all 68 landmarks.");
-            }
-
         } catch (err) {
-            console.error("Error during analysis:", err);
-            setError("Internal error during face analysis.");
+            console.error("Analysis error:", err);
+            setError("Ocurrió un error durante el análisis.");
         } finally {
             setLoading(false);
         }
     };
 
-
-
     return (
         <div className="flex items-center justify-center p-4 font-sans w-full">
             <div className="w-full max-w-2xl">
-                <div className="bg-white dark:bg-emerald-900 rounded-xl shadow-2xl p-6 sm:p-8 border border-gray-200">
+
+                <div className="bg-white rounded-xl shadow-2xl p-6">
 
                     {preview && (
-                        <img 
-                            ref={imageRef}
-                            alt="hidden-face" 
-                            style={{ display: "none" }} 
-                        />
+                        <img ref={imageRef} alt="face-hidden" style={{ display: "none" }} />
                     )}
 
                     {/* Upload area */}
                     <div className="mb-8 flex flex-col items-center">
                         <div
                             onDrop={handleDrop}
-                            onDragOver={handleDragOver}
-                            onDragLeave={handleDragLeave}
-                            className={`w-full p-10 mb-4 rounded-xl border-2 border-dashed transition ${
-                                isDragging ? "border-blue-500 bg-indigo-50" : "border-gray-300"
-                            } cursor-pointer`}
+                            onDragOver={(e) => e.preventDefault()}
+                            onDragEnter={() => setIsDragging(true)}
+                            onDragLeave={() => setIsDragging(false)}
+                            className={`w-full p-10 mb-4 rounded-xl border-2 border-dashed 
+                                ${isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300"}
+                            `}
                         >
-                            <label htmlFor="file-upload" className="flex flex-col items-center">
+                            <label htmlFor="file-upload" className="flex flex-col items-center cursor-pointer">
                                 <div className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden mb-4 border-2 border-gray-300 shadow-inner">
                                     {preview ? (
-                                        <img src={preview} alt="preview" className="w-full h-full object-cover" />
+                                        <img src={preview} className="w-full h-full object-cover" />
                                     ) : (
                                         <FiUploadCloud className="w-8 h-8 text-gray-400" />
                                     )}
                                 </div>
 
-                                <p className="text-gray-700 dark:text-white text-lg font-semibold">
-                                    {preview ? "Picture Selected" : "Click or drag an image"}
+                                <p className="text-gray-700 text-lg font-semibold">
+                                    {preview ? "Imagen seleccionada" : "Haz clic o arrastra una imagen"}
                                 </p>
                             </label>
 
                             <input
                                 id="file-upload"
                                 type="file"
-                                accept="image/jpeg,image/png,image/webp"
+                                accept="image/*"
                                 className="hidden"
                                 onChange={handleImageChange}
                             />
                         </div>
                     </div>
 
-                    {/* Analyze button */}
                     <button
                         onClick={handleAnalyze}
                         disabled={loading || !file || !modelsLoaded}
-                        className="w-full py-3 mb-6 bg-blue-600 text-white font-extrabold text-lg rounded-xl hover:bg-blue-700 disabled:bg-blue-300 transition shadow-lg"
+                        className="w-full py-3 mb-6 bg-blue-600 text-white font-bold text-lg rounded-xl"
                     >
                         {loading ? (
                             <span className="flex items-center justify-center">
                                 <TbLoader2 className="h-5 w-5 animate-spin mr-2" />
-                                Processing...
+                                Procesando...
                             </span>
                         ) : (
-                            "Analyze Face"
+                            "Analizar rostro"
                         )}
                     </button>
 
-                    {/* Result */}
                     {error && (
-                        <div className="bg-red-100 p-4 rounded-lg border border-red-300 mb-4">
+                        <div className="bg-red-100 p-4 rounded-lg mb-4">
                             <p className="text-red-700 font-semibold">{error}</p>
                         </div>
                     )}
 
-                    <div className="bg-emerald-50 p-4 rounded-lg mb-4">
-                        <p className="text-sm font-medium text-emerald-800">Detected Shape:</p>
+                    <div className="bg-emerald-50 p-4 rounded-lg mb-4 text-center">
+                        <p className="text-sm font-medium text-emerald-800">Forma detectada:</p>
                         <p className="text-2xl font-bold text-emerald-700">{faceShape.shape || "--"}</p>
                     </div>
 
-                    <div className="text-center mt-6 flex flex-col items-center gap-6 px-4">
+                    <div className="mt-6 text-center">
                         {faceShape.shape && <DetectedShape detectedShape={faceShape.shape} />}
                     </div>
 
