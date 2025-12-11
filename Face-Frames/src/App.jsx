@@ -3,6 +3,7 @@ import React from "react";
 import "./App.css";
 import Layout from "./Layout/Layout";
 import Home from "./Pages/Home/Home";
+import DashboardResult from "./Pages/DashboardResult/DashboardResult";
 import Glasses from "./Pages/Glasses";
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="Glasses" element={<Glasses />} />
+          <Route path="DashboardResult" element={<DashboardResult />} />
         </Route>
       </Routes>
     </BrowserRouter>
