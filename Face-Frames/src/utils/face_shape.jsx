@@ -13,29 +13,29 @@ function compareRankings(user, ref) {
 }
 
 export function calculateFaceShape({ positions }) {
-    if (!positions || positions.length < 68) return "Not Found";
+    if (!positions || positions.length < 68) 
+        return { shape: "Not Found", accuracy: 0 };
 
     const p = positions;
 
-    const forehead = dist(p[19], p[24]);  // frente real
-    const cheekbones = dist(p[1], p[15]); // pómulos reales
-    const jaw = dist(p[5], p[11]);        // mandíbula real
-    const height = dist(p[8], p[27]);     // altura del rostro
+    const forehead = dist(p[19], p[24]);
+    const cheekbones = dist(p[1], p[15]);
+    const jaw = dist(p[5], p[11]);
+    const height = dist(p[8], p[27]);
 
     const rawValues = [forehead, cheekbones, jaw, height];
 
-    const sorted = [...rawValues].sort((a, b) => b - a); // Descendente
+    const sorted = [...rawValues].sort((a, b) => b - a);
     const userRank = rawValues.map(v => sorted.indexOf(v) + 1);
 
-    // TABLA ORIGINAL EXACTA
     const ref = {
-        Square:      [1, 1, 1, 1],
+        Square: [1, 1, 1, 1],
         Rectangular: [2, 2, 2, 1],
-        Oval:        [2, 2, 3, 1],
-        Diamond:     [3, 2, 4, 1],
-        Round:       [2, 1, 2, 1],
-        Triangle:    [3, 2, 1, 3],
-        Heart:       [1, 2, 2, 3]
+        Oval: [2, 2, 3, 1],
+        Diamond: [3, 2, 4, 1],
+        Round: [2, 1, 2, 1],
+        Triangle: [3, 2, 1, 3],
+        Heart: [1, 2, 2, 3]
     };
 
     let bestShape = "Not Found";
@@ -49,9 +49,12 @@ export function calculateFaceShape({ positions }) {
         }
     }
 
-    if (bestScore < 4) return "Not Found";
+    const accuracy = Math.round((bestScore / 8) * 100);
 
-    return bestShape;
+    return {
+        shape: bestShape,
+        accuracy
+    };
 }
 
 export function getFaceShapeData(shape) {
