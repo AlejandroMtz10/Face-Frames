@@ -110,7 +110,7 @@ export default function ImageUploader() {
         navigate("/DashboardResult", {
             state: {
                 shape: faceShape.shape,
-                confidence: faceShape.accuracy,
+                confidence: Number(faceShape.accuracy),
                 faceImage: preview,
                 faceData: faceData
             }
