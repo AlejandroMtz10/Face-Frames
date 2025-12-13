@@ -1,36 +1,57 @@
 import React from "react";
 import { motion as Motion } from "framer-motion";
+import { useLocation, useNavigate } from "react-router-dom";
 
-export default function DashboardResult({
-  shape,
-  confidence,
-  onBack,
-  faceImage,
-  faceData,
-}) {
-  // SOLO bloqueamos si no hay shape (dato obligatorio)
-  if (!shape) return null;
+export default function DashboardResult() {
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  // Datos opcionales por si no viene faceData
-  const descriptionText = faceData?.description || "No description available.";
+  // Datos recibidos desde navigate()
+  const { shape, confidence, faceImage, faceData } = location.state || {};
+
+  // Si alguien entra directo a la URL sin datos
+  if (!shape) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white text-gray-900 dark:bg-gray-800 dark:text-white p-6">
+        <h2 className="text-2xl font-bold text-red-500">
+          ⚠ No face data received
+        </h2>
+
+        <button
+          onClick={() => navigate("/")}
+          className="mt-6 px-6 py-3 bg-gray-900 hover:bg-gray-700 dark:bg-emerald-400 dark:hover:bg-emerald-500 text-white rounded-lg"
+        >
+          Go Home
+        </button>
+      </div>
+    );
+  }
+
+  // Datos seguros
+  const descriptionText =
+    faceData?.description || "No description available.";
+
   const glassesList = faceData?.glasses?.[0] || {};
   const pictures = faceData?.pictures || [];
+  const confidenceValue = Math.min(
+    100,
+    Math.max(0, Number(confidence) || 0)
+  );
 
-  const confidenceValue = confidence || 90;
 
   return (
     <Motion.div
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full min-h-screen bg-white text-gray-900 p-6"
+      className="w-full min-h-screen bg-white text-gray-900 dark:bg-gray-800 dark:text-white p-6"
     >
       {/* HEADER */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Face Shape Analysis</h1>
 
         <button
-          onClick={onBack}
-          className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-700"
+          onClick={() => navigate(-1)}
+          className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-700 dark:bg-emerald-400 dark:hover:bg-emerald-500"
         >
           ← Back
         </button>
@@ -38,13 +59,19 @@ export default function DashboardResult({
 
       {/* TOP GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* LEFT: FACE IMAGE + SHAPE */}
+        {/* LEFT */}
         <div className="bg-gray-50 rounded-xl p-6 shadow">
-          <h2 className="text-xl font-semibold mb-4">Detected Face Shape</h2>
+          <h2 className="text-xl font-semibold mb-4 text-black">
+            Detected Face Shape
+          </h2>
 
           <div className="w-full aspect-square bg-gray-200 rounded-xl overflow-hidden flex items-center justify-center">
             {faceImage ? (
-              <img src={faceImage} alt="Face" className="w-full h-full object-cover" />
+              <img
+                src={faceImage}
+                alt="Face"
+                className="w-full h-full object-cover"
+              />
             ) : (
               <p className="text-gray-500">No image</p>
             )}
@@ -55,38 +82,56 @@ export default function DashboardResult({
           </p>
         </div>
 
-        {/* MIDDLE: CONFIDENCE BAR */}
+        {/* MIDDLE */}
         <div className="bg-gray-50 rounded-xl p-6 shadow">
-          <h2 className="text-xl font-semibold mb-4">Confidence Level</h2>
+          <h2 className="text-xl font-semibold mb-4 text-black">
+            Confidence Level
+          </h2>
 
           <div className="flex items-end justify-center h-64">
-            <div className="w-20 bg-gray-300 rounded-xl overflow-hidden flex flex-col justify-end">
+            <div className="relative w-20 h-full bg-gray-200 rounded-xl overflow-hidden">
+
+              <div className="absolute inset-0 bg-gray-200" />
+
+              {/* Progress */}
               <div
-                className="bg-blue-600 rounded-xl"
-                style={{ height: `${confidenceValue}%` }}
-              ></div>
+                className="absolute bottom-0 left-0 w-full bg-blue-600 rounded-xl transition-all duration-700 ease-out"
+                style={{ height: `${confidenceValue}%`, minHeight: "4px" }}
+              />
+                <div className="absolute inset-0 flex items-center justify-center text-sm font-bold text-white">
+                  {confidenceValue}%
+                </div>
             </div>
           </div>
 
-          <p className="text-center mt-4 text-xl font-bold">
+          <p className="text-center mt-4 text-xl font-bold text-blue-600">
             {confidenceValue}% accuracy
           </p>
         </div>
 
-        {/* RIGHT: DESCRIPTION */}
+        {/* RIGHT */}
         <div className="bg-gray-50 rounded-xl p-6 shadow">
-          <h2 className="text-xl font-semibold mb-4">Shape Description</h2>
-          <p className="text-gray-700 leading-relaxed">{descriptionText}</p>
+          <h2 className="text-xl font-semibold mb-4 text-black">
+            Shape Description
+          </h2>
+          <p className="text-gray-800 leading-relaxed">
+            {descriptionText}
+          </p>
         </div>
       </div>
 
       {/* RECOMMENDATIONS */}
-      <div className="mt-10 bg-gray-50 p-6 rounded-xl shadow">
-        <h2 className="text-2xl font-semibold mb-4">Recommended Glasses</h2>
+      <div className="mt-10 bg-gray-50 p-6 rounded-xl shadow text-black">
+        <h2 className="text-2xl font-semibold mb-4">
+          Recommended Glasses
+        </h2>
 
         <ul className="space-y-4">
           {Object.entries(glassesList).map(([type, text], index) => (
-            <li key={index} className="border-l-4 border-blue-600 pl-4">
+            <li
+              key={index}
+              className="border-l-4 border-blue-600 pl-4"
+            >
               <p className="font-semibold text-lg">{type}</p>
               <p className="text-gray-700">{text}</p>
             </li>
@@ -96,7 +141,9 @@ export default function DashboardResult({
 
       {/* PICTURES */}
       <div className="mt-10">
-        <h2 className="text-2xl font-semibold mb-4">Example Glasses</h2>
+        <h2 className="text-2xl font-semibold mb-4">
+          Example Glasses
+        </h2>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
           {pictures.map((item, index) => (
@@ -107,7 +154,7 @@ export default function DashboardResult({
               <img
                 src={item.picture}
                 alt={item.glasses}
-                className="w-full h-36 object-cover rounded-xl"
+                className="w-full h-40 object-cover rounded-xl"
               />
               <p className="text-center text-sm mt-2 text-gray-600">
                 {item.glasses}
