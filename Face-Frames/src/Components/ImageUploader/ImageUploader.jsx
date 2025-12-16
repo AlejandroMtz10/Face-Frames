@@ -1,203 +1,207 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { calculateFaceShape, getFaceShapeData  } from "../../utils/face_shape.jsx";
+import { useNavigate } from "react-router-dom";
 import { FiUploadCloud } from "react-icons/fi";
 import { TbLoader2 } from "react-icons/tb";
-import * as faceapi from "face-api.js";
-import { useNavigate } from "react-router-dom";
+
+import {
+    calculateFaceShape,
+    getFaceShapeData,
+} from "../../utils/face_shape.jsx";
+
+let faceLandmarker = null;
 
 export default function ImageUploader() {
-    const [preview, setPreview] = useState(null);
-    const [file, setFile] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [modelsLoaded, setModelsLoaded] = useState(false);
-    const [faceShape, setFaceShape] = useState({ shape: null, accuracy: 0 });
-    const [error, setError] = useState(null);
-    const [isDragging, setIsDragging] = useState(false);
-
     const navigate = useNavigate();
     const imageRef = useRef(null);
 
-    // Load models once
+    const [file, setFile] = useState(null);
+    const [preview, setPreview] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [modelsLoaded, setModelsLoaded] = useState(false);
+    const [error, setError] = useState(null);
+    const [isDragging, setIsDragging] = useState(false);
+    const [faceShape, setFaceShape] = useState({
+        shape: null,
+        accuracy: 0,
+    });
+
+    // Load MediaPipe once
     useEffect(() => {
-        const loadModels = async () => {
-            try {
-                setLoading(true);
+        const loadModel = async () => {
+        try {
+            const { FaceLandmarker, FilesetResolver } = await import(
+                "@mediapipe/tasks-vision"
+            );
 
-                await Promise.all([
-                    faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
-                    faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
-                ]);
+            const resolver = await FilesetResolver.forVisionTasks(
+                "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
+            );
 
-                setModelsLoaded(true);
-            } catch (err) {
-                console.error("Model load error:", err);
-                setError("Models could not be loaded. Check /public/models.");
-            } finally {
-                setLoading(false);
-            }
+            faceLandmarker = await FaceLandmarker.createFromOptions(resolver, {
+                baseOptions: {
+                    modelAssetPath: "/models/face_landmarker.task",
+                    delegate: "CPU",
+                },
+                runningMode: "IMAGE",
+                numFaces: 1,
+            });
+
+            setModelsLoaded(true);
+        } catch {
+            setError("Face analysis model could not be loaded.");
+        }
         };
 
-        loadModels();
+        loadModel();
     }, []);
 
     const processFile = useCallback((selectedFile) => {
         if (!selectedFile) return;
 
-        const validTypes = ["image/jpeg", "image/png", "image/webp"];
-        if (!validTypes.includes(selectedFile.type)) {
-            setError("Unsupported file format.");
-            return;
+        const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+        if (!allowedTypes.includes(selectedFile.type)) {
+            setError("Unsupported image format.");
+        return;
         }
 
         setFile(selectedFile);
         setPreview(URL.createObjectURL(selectedFile));
-        setError(null);
         setFaceShape({ shape: null, accuracy: 0 });
+        setError(null);
     }, []);
 
-    const handleImageChange = (e) => processFile(e.target.files[0]);
-
-    const handleDrop = (e) => {
-        e.preventDefault();
-        setIsDragging(false);
-        processFile(e.dataTransfer.files[0]);
-    };
-
     const handleAnalyze = async () => {
-        if (!file) return setError("Please select an image first.");
-        if (!modelsLoaded) return setError("Models are still loading...");
+        if (!file || !modelsLoaded || !faceLandmarker) return;
 
         setLoading(true);
         setError(null);
 
         try {
-            const img = await faceapi.bufferToImage(file);
-            imageRef.current = img;
+            const img = imageRef.current;
+            const result = faceLandmarker.detect(img);
 
-            const options = new faceapi.SsdMobilenetv1Options({
-                minConfidence: 0.5,
-            });
-
-            const detection = await faceapi
-                .detectSingleFace(img, options)
-                .withFaceLandmarks();
-
-            if (!detection) {
+            if (!result.faceLandmarks.length) {
                 setError("No face detected.");
                 return;
             }
 
-            const positions = detection.landmarks.positions.map((p) => ({
-                x: p.x,
-                y: p.y,
+            const landmarks = result.faceLandmarks[0].map((p) => ({
+                x: p.x * img.naturalWidth,
+                y: p.y * img.naturalHeight,
             }));
 
-            const { shape, accuracy } = calculateFaceShape({ positions });
-
-            setFaceShape({ shape, accuracy });
-        } catch (err) {
-            console.error("Analysis error:", err);
-            setError("An error occurred during analysis.");
+            const resultShape = calculateFaceShape({ positions: landmarks });
+            setFaceShape(resultShape);
+        } catch {
+            setError("Face analysis failed.");
         } finally {
             setLoading(false);
         }
     };
 
-    const handleViewDetails = () => {
-        const faceData = getFaceShapeData(faceShape.shape);
-
-        navigate("/DashboardResult", {
-            state: {
-                shape: faceShape.shape,
-                confidence: Number(faceShape.accuracy),
-                faceImage: preview,
-                faceData: faceData
-            }
-        });
-    };
-
+const handleViewDetails = () => {
+    navigate("/DashboardResult", {
+        state: {
+            shape: faceShape.shape,
+            confidence: faceShape.accuracy,
+            faceImage: preview,
+            faceData: getFaceShapeData(faceShape.shape),
+        },
+    });
+};
 
     return (
-        <div className="flex items-center justify-center p-4 font-sans w-full">
-            <div className="w-full max-w-2xl">
-                <div className="bg-white rounded-xl shadow-2xl p-6">
+        <div className="w-full flex justify-center p-4">
+            <div className="w-full max-w-2xl bg-white rounded-xl shadow-xl p-6">
+                {preview && (
+                    <img
+                        ref={imageRef}
+                        src={preview}
+                        alt="hidden-face"
+                        className="hidden"
+                    />
+                )}
 
-                    {preview && (
-                        <img ref={imageRef} alt="face-hidden" style={{ display: "none" }} />
-                    )}
+                {/* Upload */}
+                <div
+                    onDrop={(e) => {
+                        e.preventDefault();
+                        setIsDragging(false);
+                        processFile(e.dataTransfer.files[0]);
+                    }}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDragEnter={() => setIsDragging(true)}
+                    onDragLeave={() => setIsDragging(false)}
+                    className={`border-2 border-dashed rounded-xl p-8 mb-6 text-center transition
+                        ${
+                        isDragging
+                            ? "border-blue-500 bg-blue-50"
+                            : "border-gray-300"
+                        }`}
+                >
+                    <label className="cursor-pointer">
+                        <input
+                            type="file"
+                            accept="image/*"
+                            hidden
+                            onChange={(e) => processFile(e.target.files[0])}
+                        />
 
-                    {/* Upload area */}
-                    <div className="mb-8 flex flex-col items-center">
-                        <div
-                            onDrop={handleDrop}
-                            onDragOver={(e) => e.preventDefault()}
-                            onDragEnter={() => setIsDragging(true)}
-                            onDragLeave={() => setIsDragging(false)}
-                            className={`w-full p-10 mb-4 rounded-xl border-2 border-dashed 
-                                ${isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300"}
-                            `}
-                        >
-                            <label htmlFor="file-upload" className="flex flex-col items-center cursor-pointer">
-                                <div className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden mb-4 border-2 border-gray-300 shadow-inner">
-                                    {preview ? (
-                                        <img src={preview} className="w-full h-full object-cover" />
-                                    ) : (
-                                        <FiUploadCloud className="w-8 h-8 text-gray-400" />
-                                    )}
-                                </div>
-
-                                <p className="text-gray-700 text-lg font-semibold">
-                                    {preview ? "Image selected" : "Click or drag an image"}
-                                </p>
-                            </label>
-
-                            <input
-                                id="file-upload"
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                onChange={handleImageChange}
-                            />
+                        <div className="w-32 h-32 mx-auto mb-4 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                            {preview ? (
+                                <img
+                                src={preview}
+                                alt="preview"
+                                className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <FiUploadCloud className="w-8 h-8 text-gray-400" />
+                            )}
                         </div>
-                    </div>
 
-                    <button
-                        onClick={handleAnalyze}
-                        disabled={loading || !file || !modelsLoaded}
-                        className="w-full py-3 mb-6 bg-blue-600 text-white font-bold text-lg rounded-xl"
-                    >
-                        {loading ? (
-                            <span className="flex items-center justify-center">
-                                <TbLoader2 className="h-5 w-5 animate-spin mr-2" />
-                                Processing...
-                            </span>
-                        ) : (
-                            "Analyze Face"
-                        )}
-                    </button>
-
-                    {error && (
-                        <div className="bg-red-100 p-4 rounded-lg mb-4">
-                            <p className="text-red-700 font-semibold">{error}</p>
-                        </div>
-                    )}
-
-                    <div className="bg-emerald-50 p-4 rounded-lg mb-4 text-center">
-                        <p className="text-sm font-medium text-emerald-800">Detected Shape:</p>
-                        <p className="text-2xl font-bold text-emerald-700">{faceShape.shape || "--"}</p>
-                    </div>
-
-                    {/* View More Button */}
-                    {faceShape.shape && (
-                        <button
-                            onClick={handleViewDetails}
-                            className="w-full py-3 mt-2 bg-cyan-600 text-white font-bold text-lg rounded-xl"
-                        >
-                            View Details
-                        </button>
-                    )}
+                        <p className="font-semibold text-gray-700">
+                            {preview ? "Image selected" : "Click or drag an image"}
+                        </p>
+                    </label>
                 </div>
+
+                {/* Analyze */}
+                <button
+                    onClick={handleAnalyze}
+                    disabled={!file || loading || !modelsLoaded}
+                    className="w-full py-3 bg-blue-600 text-white font-bold rounded-xl disabled:opacity-50"
+                >
+                    {loading ? (
+                        <span className="flex items-center justify-center">
+                            <TbLoader2 className="animate-spin mr-2" />
+                            Processing...
+                        </span>
+                    ) : (
+                        "Analyze Face"
+                    )}
+                </button>
+
+                {error && (
+                    <div className="mt-4 bg-red-100 text-red-700 p-3 rounded-lg">
+                        {error}
+                    </div>
+                )}
+
+                <div className="mt-6 bg-emerald-50 text-center p-4 rounded-lg">
+                    <p className="text-sm text-emerald-800">Detected Shape</p>
+                    <p className="text-2xl font-bold text-emerald-700">
+                        {faceShape.shape || "--"}
+                    </p>
+                </div>
+
+                {faceShape.shape && (
+                    <button
+                        onClick={handleViewDetails}
+                        className="w-full mt-4 py-3 bg-cyan-600 text-white font-bold rounded-xl"
+                    >
+                        View Details
+                    </button>
+                )}
             </div>
         </div>
     );
