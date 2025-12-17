@@ -33,11 +33,11 @@ export default function DashboardResult() {
 
   const glassesList = faceData?.glasses?.[0] || {};
   const pictures = faceData?.pictures || [];
-  const confidenceValue = Math.min(
+  let confidenceValue = Math.min(
     100,
     Math.max(0, Number(confidence) || 0)
   );
-
+  confidenceValue =  confidenceValue.toFixed(2);
 
   return (
     <Motion.div
