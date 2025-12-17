@@ -1,131 +1,83 @@
 import shapeData from "../Data-json/shape-face.json";
 
-const TOLERANCE_FACTOR = 0.07; // 7% difference to consider measurements similar
-
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
-/**
- * Generates a similarity ranking based on relative values.
- * Similar values (within tolerance) share the same rank.
- */
-function generateSimilarityRanking(values) {
-    const indexed = values.map((value, index) => ({ value, index }));
-    indexed.sort((a, b) => b.value - a.value);
-
-    const ranks = new Array(values.length).fill(0);
-    let currentRank = 1;
-
-    for (let i = 0; i < indexed.length; i++) {
-        const { value, index } = indexed[i];
-
-        if (i === 0) {
-            ranks[index] = currentRank;
-        } else {
-            const prevValue = indexed[i - 1].value;
-            const relativeDiff = Math.abs(value - prevValue) / prevValue;
-
-        if (relativeDiff <= TOLERANCE_FACTOR) {
-            ranks[index] = currentRank;
-        } else {
-            currentRank = i + 1;
-            ranks[index] = currentRank;
-        }
-        }
-    }
-
-    return ranks.map((r) => Math.min(r, 4));
-}
-
-/**
- * Compares two ranking arrays and returns a similarity score.
- */
-function compareRankings(userRank, referenceRank) {
-    let score = 0;
-
-    for (let i = 0; i < 4; i++) {
-        if (userRank[i] === referenceRank[i]) score += 2;
-        else if (Math.abs(userRank[i] - referenceRank[i]) === 1) score += 1;
-    }
-
-    return score;
-}
-
-/**
- * Main face shape calculation using MediaPipe 468 landmarks.
- */
 export function calculateFaceShape({ positions }) {
-    if (!positions || positions.length < 468) {
-        return { shape: "Not Found", accuracy: 0 };
+  // 1. Validación de entrada
+  if (!positions || positions.length < 468) {
+    console.warn("MediaPipe no envió suficientes puntos.");
+    return { shape: "Not Found", accuracy: 0 };
+  }
+
+  const p = positions;
+
+  // --- Mediciones estables ---
+  const cheekboneWidth = distance(p[234], p[454]); // Puntos más externos de los pómulos
+  const jawWidth = distance(p[172], p[397]);      // Ancho de la mandíbula
+  const foreheadWidth = distance(p[109], p[338]); // Ancho de la frente
+  const faceHeight = distance(p[152], p[10]);     // Mentón a tope de frente
+
+  // --- Ratios normalizados ---
+  const heightToWidth = faceHeight / cheekboneWidth;
+  const jawToCheek = jawWidth / cheekboneWidth;
+  const foreheadToCheek = foreheadWidth / cheekboneWidth;
+
+  // LOG PARA DEPURACIÓN: Mira estos valores en tu consola
+  console.log("Ratios calculados:", { heightToWidth, jawToCheek, foreheadToCheek });
+
+  const models = {
+    Round:       { h: 1.1,  j: 0.88, f: 0.90 },
+    Square:      { h: 1.1,  j: 0.98, f: 1.00 },
+    Oval:        { h: 1.4,  j: 0.82, f: 0.88 },
+    Rectangular: { h: 1.6,  j: 0.92, f: 0.92 },
+    Heart:       { h: 1.25, j: 0.70, f: 1.05 },
+    Diamond:     { h: 1.35, j: 0.70, f: 0.80 },
+    Triangle:    { h: 1.2,  j: 1.05, f: 0.80 },
+  };
+
+  const scores = {};
+
+  for (const shape in models) {
+    const m = models[shape];
+    const diff =
+      Math.abs(heightToWidth - m.h) +
+      Math.abs(jawToCheek - m.j) +
+      Math.abs(foreheadToCheek - m.f);
+
+    // Scoring más suave: multiplicamos por 80 en lugar de 120
+    scores[shape] = clamp(100 - diff * 80, 0, 100);
+  }
+
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const [bestShape, bestScore] = sorted[0];
+  const [, secondScore] = sorted[1];
+
+  // RELAJACIÓN DE UMBRALES:
+  // Bajamos el mínimo a 40 y la diferencia de ambigüedad a 2
+  if (bestScore < 40 || (bestScore - secondScore < 2)) {
+    console.log("Resultado ambiguo o bajo puntaje:", { bestScore, secondScore });
+    // Aun así intentamos devolver la mejor opción si es mayor a 0
+    if (bestScore > 0) return { shape: bestShape, accuracy: bestScore, scores };
+    return { shape: "Not Found", accuracy: bestScore, scores };
+  }
+
+  return {
+    shape: bestShape,
+    accuracy: Math.round(clamp(bestScore, 55, 98)),
+    scores,
+  };
+}
+
+export function getFaceShapeData(shape) {
+  if (!shape) return null;
+
+  return (
+    shapeData.find((s) => s.name === shape) || {
+      name: shape,
+      description: "No data found.",
+      glasses: [],
+      pictures: [],
     }
-
-    const p = positions;
-
-    // Measurements based on MediaPipe landmark indices
-    const foreheadWidth = distance(p[103], p[332]);
-    const cheekboneWidth = distance(p[127], p[356]);
-
-    const chin = p[152];
-    const jawLeft = distance(chin, p[58]);
-    const jawRight = distance(chin, p[288]);
-    const jawWidth = (jawLeft + jawRight) / 2;
-
-    const faceHeight = distance(chin, p[10]);
-
-    const measurements = [
-        foreheadWidth,
-        cheekboneWidth,
-        jawWidth,
-        faceHeight,
-    ];
-
-    const userRanking = generateSimilarityRanking(measurements);
-
-    const referenceRanks = {
-        Square: [1, 1, 1, 1],
-        Rectangular: [2, 2, 2, 1],
-        Oval: [2, 2, 3, 1],
-        Diamond: [3, 2, 4, 1],
-        Round: [2, 1, 2, 1],
-        Triangle: [3, 2, 1, 3],
-        Heart: [1, 2, 2, 3],
-    };
-
-    let bestShape = "Not Found";
-    let bestScore = -1;
-
-    for (const shape in referenceRanks) {
-        const score = compareRankings(userRanking, referenceRanks[shape]);
-        if (score > bestScore) {
-        bestScore = score;
-        bestShape = shape;
-        }
-    }
-
-    const accuracy = Math.round((bestScore / 8) * 100);
-
-    if (bestScore < 5) {
-        return { shape: "Not Found", accuracy };
-    }
-
-    return { shape: bestShape, accuracy };
-    }
-
-    /**
-     * Returns descriptive data for a detected face shape.
-     */
-    export function getFaceShapeData(shape) {
-    if (!shape) return null;
-
-    const result = shapeData.find((item) => item.name === shape);
-
-    if (!result) {
-        return {
-        name: shape,
-        description: "No data found.",
-        glasses: [],
-        pictures: [],
-        };
-    }
-
-    return result;
+  );
 }
