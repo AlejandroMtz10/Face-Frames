@@ -299,6 +299,42 @@
                 "picture":" pictures/glasses_Cat-eye_02.webp"
             }
         ]
+    },{
+        "name": "Triangle",
+        "description": "A triangle face shape is characterized by a narrower forehead and a wider, stronger jawline. The jaw is the widest part of the face, and the forehead is the narrowest.",
+        "glasses": [
+            {
+                "Cat-eye": "These are highly recommended because the upswept corners draw the eye upward and add width to the upper part of the face, balancing the jawline.",
+                "Browline": "By emphasizing the top of the frame with a bold brow line, these glasses add horizontal width to the forehead and create a more balanced silhouette.",
+                "Aviator": "The wider top part of aviator frames helps broaden the appearance of the forehead, providing a nice contrast to a broader jaw.",
+                "Oversized and Decorative Temples": "Large frames or those with details on the upper temples draw attention away from the jaw and toward the eyes."
+            }
+        ],
+        "pictures": [
+            {
+                "glasses": "Glasses Cat Eye",
+                "picture": "pictures/glasses_Cat-eye_01.webp"
+            },
+            {
+                "glasses": "Glasses Cat Eye",
+                "picture": "pictures/glasses_Cat-eye_02.webp"
+            },
+            {
+                "glasses": "Glasses Browline",
+                "picture": "pictures/glasses_Browline_01.webp"
+            },
+            {
+                "glasses": "Glasses Browline",
+                "picture": "pictures/glasses_Browline_02.webp"
+            },
+            {
+                "glasses": "Glasses Aviator",
+                "picture": "pictures/glasses_aviator_01.webp"
+            },
+            {
+                "glasses": "Glasses Aviator",
+                "picture": "pictures/glasses_aviator_02.webp"
+            }
+        ]
     }
-
 ]
