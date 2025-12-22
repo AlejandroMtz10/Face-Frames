@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 
-import glassesImg1 from "../../Assets/pictures/glasses.webp";
-import glassesImg2 from "../../Assets/pictures/glasses2.webp";
-import glassesImg3 from "../../Assets/pictures/glasses3.webp";
-import glassesImg4 from "../../Assets/pictures/glasses4.webp";
-import glassesImg5 from "../../Assets/pictures/glasses5.webp";
+import glassesImg1 from "../../assets/pictures/glasses.webp";
+import glassesImg2 from "../../assets/pictures/glasses2.webp";
+import glassesImg3 from "../../assets/pictures/glasses3.webp";
+import glassesImg4 from "../../assets/pictures/glasses4.webp";
+import glassesImg5 from "../../assets/pictures/glasses5.webp";
 
 const images = [
   glassesImg1,
