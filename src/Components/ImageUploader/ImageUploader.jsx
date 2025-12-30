@@ -164,7 +164,9 @@ const handleViewDetails = () => {
                         </p>
                     </label>
                 </div>
-
+                <p className="text-lg text-gray-900 dark:text-emerald-800 pb-2">
+                    Note: Upload a clear photo of your face for best results and try it 3 times for a better result.
+                </p>
                 {/* Analyze */}
                 <button
                     onClick={handleAnalyze}
