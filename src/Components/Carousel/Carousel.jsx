@@ -54,7 +54,7 @@ function Carousel() {
                     sm:h-80
                     md:aspect-3/2 
                     md:h-auto 
-                    max-h-[700px]
+                    max-h-180
                 "
           >
             <img

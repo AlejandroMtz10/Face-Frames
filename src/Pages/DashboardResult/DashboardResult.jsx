@@ -6,10 +6,10 @@ export default function DashboardResult() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Datos recibidos desde navigate()
+  // DATA from navigate()
   const { shape, confidence, faceImage, faceData } = location.state || {};
 
-  // Si alguien entra directo a la URL sin datos
+  // If somebody enters the URL directly without data
   if (!shape) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white text-gray-900 dark:bg-gray-800 dark:text-white p-6">
@@ -27,7 +27,7 @@ export default function DashboardResult() {
     );
   }
 
-  // Datos seguros
+  // Safe data
   const descriptionText =
     faceData?.description || "No description available.";
 
@@ -154,7 +154,7 @@ export default function DashboardResult() {
               <img
                 src={item.picture}
                 alt={item.glasses}
-                className="w-full h-40 object-cover rounded-xl"
+                className="w-full aspect-square object-contain bg-white rounded-xl p-2"
               />
               <p className="text-center text-sm mt-2 text-gray-600">
                 {item.glasses}
