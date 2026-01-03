@@ -1,16 +1,59 @@
-# React + Vite
+<div align="center">
+  <img src="src/assets/resources/FaceFrames.png" alt="Face-Frames Logo" height="100" />
+  <h1>Face-Frames</h1>
+</div>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<hr />
 
-Currently, two official plugins are available:
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <!-- LEFT: Descriptions -->
+    <td width="65%" valign="top">
+      <h2>Description</h2>
+      <p><strong>Facial analysis and intelligent eyewear recommendation.</strong></p>
+      <blockquote>
+        An application that detects face shapes using facial landmarks and biometric calculations
+        to recommend the perfect frames.
+      </blockquote>
+      <h2>Descripción</h2>
+      <p><strong>Análisis facial y recomendación inteligente de lentes.</strong></p>
+      <blockquote>
+        Aplicación que detecta la forma del rostro mediante facial landmarks (puntos de referencia)
+        y cálculos biométricos para recomendar el armazón ideal.
+      </blockquote>
+    </td>
+    <!-- RIGHT: GIF -->
+    <td width="35%" align="center" valign="middle">
+      <img
+        src="https://media.giphy.com/media/TEnXkcsHrP4YedChhA/giphy.gif"
+        alt="Face-Frames Demo"
+        width="260"
+      />
+    </td>
+  </tr>
+</table>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## React Compiler
+<hr />
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+<h2>Tools and Technologies | Herramientas y Tecnologías</h2>
+  <ul>
+    <li><strong>Models:</strong> MediaPipe (Facial Landmarks)</li>
+    <li><strong>Package Manager:</strong> PNPM</li>
+    <li><strong>Frontend:</strong> JavaScript, React JS & Tailwind CSS</li>
+    <li><strong>Tools:</strong> Docker, Git & GitHub</li>
+    <li><strong>Deploy:</strong> Vercel</li>
+  </ul>
+  <p align="center">
+    <a href="https://skillicons.dev">
+      <img src="https://skillicons.dev/icons?i=html,css,tailwind,js,react,ai,vite,git,github,docker,pnpm,vercel&perline=14" />
+    </a>
+  </p>
+<hr />
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+<div align="center">
+  <h3>
+    🔗 <a href="https://face-frames.vercel.app">Face-Frames App</a>
+  </h3>
+  <p><code>v1.1.3</code></p>
+</div>
