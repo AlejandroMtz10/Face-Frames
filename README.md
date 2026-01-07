@@ -52,6 +52,19 @@
 <hr />
 
 <div align="center">
+    <h2>Face-Frames Screenshot (analyzer). | Captura de pantalla (analizador).</h2>
+    <img src="./public/pictures/Face-Frames.png" />
+</div>
+<div>
+  <h2>📅 Project Details | Detalles del Proyecto</h2>
+    <ul>
+      <li><strong>Type | Tipo:</strong> Web Application | Aplicación web</li>
+      <li><strong>Date:</strong> December 23th, 2025 | Diciembre 23 del 2025</li>
+      <li><strong>App | Aplicación:</strong> Public | Publica</li>
+    </ul>
+</div>
+<hr />
+<div align="center">
   <h3>
     🔗 <a href="https://face-frames.vercel.app">Face-Frames App</a>
   </h3>
